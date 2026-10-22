@@ -1,0 +1,1295 @@
+{
+ "schema_version": 1,
+ "illustrative": true,
+ "today": "2026-11-17",
+ "window": {
+  "from": "2026-10-20",
+  "to": "2026-11-16",
+  "weeks": 4,
+  "label": "desde el inicio de la rutina v1"
+ },
+ "profile": {
+  "sex": "masculino",
+  "age": 21,
+  "height_cm": 174,
+  "weight_kg": 72.1,
+  "experience_years": 4,
+  "habitual_rir": 2,
+  "goal": "hipertrofia",
+  "priority_muscles": [
+   "pectoral",
+   "deltoides_lateral"
+  ],
+  "phase": {
+   "name": "definicion",
+   "start": "2026-10-20",
+   "target": "inicios de diciembre de 2026"
+  },
+  "equipment": "gimnasio completo, sin hack ni máquinas guiadas de pecho y espalda",
+  "limitations": null
+ },
+ "routine": {
+  "version": 1,
+  "start_on": "2026-10-20",
+  "review_on": "2026-11-17",
+  "muscle_targets": [
+   {
+    "muscle_id": "pectoral",
+    "target": 12,
+    "range": [
+     10,
+     14
+    ],
+    "fractional_target": 12,
+    "priority": "alta"
+   },
+   {
+    "muscle_id": "deltoides_lateral",
+    "target": 12,
+    "range": [
+     10,
+     14
+    ],
+    "fractional_target": 12,
+    "priority": "alta"
+   },
+   {
+    "muscle_id": "deltoides_posterior",
+    "target": 4,
+    "range": [
+     4,
+     6
+    ],
+    "fractional_target": 6.5,
+    "priority": "media"
+   },
+   {
+    "muscle_id": "deltoides_anterior",
+    "target": 0,
+    "range": null,
+    "fractional_target": 4.5,
+    "priority": "media"
+   },
+   {
+    "muscle_id": "espalda",
+    "target": 10,
+    "range": [
+     8,
+     12
+    ],
+    "fractional_target": 10,
+    "priority": "mantenimiento"
+   },
+   {
+    "muscle_id": "triceps",
+    "target": 6,
+    "range": [
+     5,
+     8
+    ],
+    "fractional_target": 10.5,
+    "priority": "mantenimiento"
+   },
+   {
+    "muscle_id": "biceps",
+    "target": 5,
+    "range": [
+     4,
+     6
+    ],
+    "fractional_target": 10,
+    "priority": "mantenimiento"
+   },
+   {
+    "muscle_id": "cuadriceps",
+    "target": 11,
+    "range": [
+     10,
+     12
+    ],
+    "fractional_target": 11,
+    "priority": "mantenimiento"
+   },
+   {
+    "muscle_id": "isquiotibiales",
+    "target": 10,
+    "range": [
+     8,
+     10
+    ],
+    "fractional_target": 10,
+    "priority": "mantenimiento"
+   },
+   {
+    "muscle_id": "gluteos",
+    "target": 0,
+    "range": null,
+    "fractional_target": 4.5,
+    "priority": "mantenimiento"
+   },
+   {
+    "muscle_id": "pantorrillas",
+    "target": 10,
+    "range": [
+     8,
+     10
+    ],
+    "fractional_target": 10,
+    "priority": "mantenimiento"
+   }
+  ],
+  "days": [
+   {
+    "id": "d1",
+    "name": "Torso",
+    "weekday": 1,
+    "exercises": [
+     {
+      "id": "rde-1",
+      "exercise_id": "ex-banca",
+      "name": "Press de banca con barra",
+      "brain_page": "press-de-banca",
+      "sets": 3,
+      "reps": [
+       6,
+       10
+      ],
+      "rir": [
+       1,
+       2
+      ],
+      "rest_s": [
+       120,
+       180
+      ]
+     },
+     {
+      "id": "rde-2",
+      "exercise_id": "ex-remo-t",
+      "name": "Remo en T",
+      "brain_page": null,
+      "sets": 3,
+      "reps": [
+       8,
+       12
+      ],
+      "rir": [
+       1,
+       2
+      ],
+      "rest_s": [
+       120,
+       180
+      ]
+     },
+     {
+      "id": "rde-3",
+      "exercise_id": "ex-inclinado-manc",
+      "name": "Press inclinado con mancuernas",
+      "brain_page": "press-inclinado",
+      "sets": 3,
+      "reps": [
+       8,
+       12
+      ],
+      "rir": [
+       1,
+       2
+      ],
+      "rest_s": [
+       120,
+       180
+      ]
+     },
+     {
+      "id": "rde-4",
+      "exercise_id": "ex-jalon",
+      "name": "Jalón al pecho en polea",
+      "brain_page": null,
+      "sets": 2,
+      "reps": [
+       8,
+       12
+      ],
+      "rir": [
+       1,
+       2
+      ],
+      "rest_s": [
+       120,
+       120
+      ]
+     },
+     {
+      "id": "rde-5",
+      "exercise_id": "ex-laterales",
+      "name": "Elevaciones laterales (mancuerna o polea)",
+      "brain_page": "elevaciones-laterales",
+      "sets": 3,
+      "reps": [
+       12,
+       16
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-6",
+      "exercise_id": "ex-triceps",
+      "name": "Extensión de tríceps por encima de la cabeza",
+      "brain_page": "extension-de-triceps-por-encima-de-la-cabeza",
+      "sets": 3,
+      "reps": [
+       10,
+       15
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-7",
+      "exercise_id": "ex-curl-manc",
+      "name": "Curl con mancuernas",
+      "brain_page": null,
+      "sets": 2,
+      "reps": [
+       10,
+       15
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       90
+      ]
+     }
+    ]
+   },
+   {
+    "id": "d2",
+    "name": "Pierna A",
+    "weekday": 2,
+    "exercises": [
+     {
+      "id": "rde-8",
+      "exercise_id": "ex-prensa",
+      "name": "Prensa",
+      "brain_page": "prensa",
+      "sets": 3,
+      "reps": [
+       8,
+       12
+      ],
+      "rir": [
+       1,
+       2
+      ],
+      "rest_s": [
+       120,
+       180
+      ]
+     },
+     {
+      "id": "rde-9",
+      "exercise_id": "ex-ext-cuad",
+      "name": "Extensión de cuádriceps",
+      "brain_page": "extension-de-cuadriceps",
+      "sets": 3,
+      "reps": [
+       12,
+       20
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-10",
+      "exercise_id": "ex-curl-fem",
+      "name": "Curl femoral acostado",
+      "brain_page": "curl-femoral-acostado",
+      "sets": 3,
+      "reps": [
+       10,
+       15
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-11",
+      "exercise_id": "ex-pmr",
+      "name": "Peso muerto rumano",
+      "brain_page": null,
+      "sets": 3,
+      "reps": [
+       8,
+       12
+      ],
+      "rir": [
+       2,
+       2
+      ],
+      "rest_s": [
+       120,
+       180
+      ]
+     },
+     {
+      "id": "rde-12",
+      "exercise_id": "ex-talones",
+      "name": "Elevación de talones de pie",
+      "brain_page": "elevacion-de-talones-de-pie",
+      "sets": 5,
+      "reps": [
+       10,
+       15
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       90
+      ]
+     }
+    ]
+   },
+   {
+    "id": "d3",
+    "name": "Empuje",
+    "weekday": 3,
+    "exercises": [
+     {
+      "id": "rde-13",
+      "exercise_id": "ex-inclinado-barra",
+      "name": "Press inclinado con barra",
+      "brain_page": "press-inclinado",
+      "sets": 3,
+      "reps": [
+       6,
+       10
+      ],
+      "rir": [
+       1,
+       2
+      ],
+      "rest_s": [
+       120,
+       180
+      ]
+     },
+     {
+      "id": "rde-14",
+      "exercise_id": "ex-cruces",
+      "name": "Cruces en polea",
+      "brain_page": "aperturas",
+      "sets": 3,
+      "reps": [
+       12,
+       15
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-15",
+      "exercise_id": "ex-laterales",
+      "name": "Elevaciones laterales (mancuerna o polea)",
+      "brain_page": "elevaciones-laterales",
+      "sets": 5,
+      "reps": [
+       12,
+       16
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-16",
+      "exercise_id": "ex-triceps",
+      "name": "Extensión de tríceps por encima de la cabeza",
+      "brain_page": "extension-de-triceps-por-encima-de-la-cabeza",
+      "sets": 3,
+      "reps": [
+       10,
+       15
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     }
+    ]
+   },
+   {
+    "id": "d4",
+    "name": "Tirón",
+    "weekday": 4,
+    "exercises": [
+     {
+      "id": "rde-17",
+      "exercise_id": "ex-dominadas",
+      "name": "Dominadas",
+      "brain_page": null,
+      "sets": 3,
+      "reps": [
+       6,
+       10
+      ],
+      "rir": [
+       1,
+       2
+      ],
+      "rest_s": [
+       120,
+       180
+      ]
+     },
+     {
+      "id": "rde-18",
+      "exercise_id": "ex-remo-polea",
+      "name": "Remo sentado en polea",
+      "brain_page": null,
+      "sets": 2,
+      "reps": [
+       8,
+       12
+      ],
+      "rir": [
+       1,
+       2
+      ],
+      "rest_s": [
+       120,
+       120
+      ]
+     },
+     {
+      "id": "rde-19",
+      "exercise_id": "ex-aperturas-inv",
+      "name": "Aperturas invertidas en polea",
+      "brain_page": null,
+      "sets": 4,
+      "reps": [
+       12,
+       20
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       90
+      ]
+     },
+     {
+      "id": "rde-20",
+      "exercise_id": "ex-laterales-polea",
+      "name": "Elevaciones laterales en polea",
+      "brain_page": "elevaciones-laterales",
+      "sets": 4,
+      "reps": [
+       12,
+       16
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-21",
+      "exercise_id": "ex-curl-barra",
+      "name": "Curl con barra o en polea",
+      "brain_page": null,
+      "sets": 3,
+      "reps": [
+       8,
+       12
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       90
+      ]
+     }
+    ]
+   },
+   {
+    "id": "d5",
+    "name": "Pierna B",
+    "weekday": 5,
+    "exercises": [
+     {
+      "id": "rde-22",
+      "exercise_id": "ex-sentadilla",
+      "name": "Sentadilla con barra",
+      "brain_page": "sentadilla",
+      "sets": 3,
+      "reps": [
+       6,
+       10
+      ],
+      "rir": [
+       2,
+       2
+      ],
+      "rest_s": [
+       180,
+       180
+      ]
+     },
+     {
+      "id": "rde-23",
+      "exercise_id": "ex-ext-cuad",
+      "name": "Extensión de cuádriceps",
+      "brain_page": "extension-de-cuadriceps",
+      "sets": 2,
+      "reps": [
+       12,
+       20
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-24",
+      "exercise_id": "ex-curl-fem",
+      "name": "Curl femoral acostado",
+      "brain_page": "curl-femoral-acostado",
+      "sets": 4,
+      "reps": [
+       10,
+       15
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       120
+      ]
+     },
+     {
+      "id": "rde-25",
+      "exercise_id": "ex-talones",
+      "name": "Elevación de talones de pie",
+      "brain_page": "elevacion-de-talones-de-pie",
+      "sets": 5,
+      "reps": [
+       10,
+       15
+      ],
+      "rir": [
+       0,
+       1
+      ],
+      "rest_s": [
+       90,
+       90
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "metrics": {
+  "adherence": {
+   "planned": 20,
+   "done": 19
+  },
+  "weekly_volume": [
+   {
+    "week_start": "2026-10-19",
+    "muscles": {
+     "pectoral": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "deltoides_lateral": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "deltoides_posterior": {
+      "direct": 4,
+      "fractional": 6.5
+     },
+     "deltoides_anterior": {
+      "direct": 0,
+      "fractional": 3.5
+     },
+     "espalda": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "triceps": {
+      "direct": 6,
+      "fractional": 9.5
+     },
+     "biceps": {
+      "direct": 5,
+      "fractional": 10
+     },
+     "cuadriceps": {
+      "direct": 11,
+      "fractional": 11
+     },
+     "isquiotibiales": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "gluteos": {
+      "direct": 0,
+      "fractional": 4.5
+     },
+     "pantorrillas": {
+      "direct": 10,
+      "fractional": 10
+     }
+    }
+   },
+   {
+    "week_start": "2026-10-26",
+    "muscles": {
+     "pectoral": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "deltoides_lateral": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "deltoides_posterior": {
+      "direct": 4,
+      "fractional": 6.5
+     },
+     "deltoides_anterior": {
+      "direct": 0,
+      "fractional": 3.5
+     },
+     "espalda": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "triceps": {
+      "direct": 6,
+      "fractional": 9.5
+     },
+     "biceps": {
+      "direct": 5,
+      "fractional": 10
+     },
+     "cuadriceps": {
+      "direct": 11,
+      "fractional": 11
+     },
+     "isquiotibiales": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "gluteos": {
+      "direct": 0,
+      "fractional": 4.5
+     },
+     "pantorrillas": {
+      "direct": 10,
+      "fractional": 10
+     }
+    }
+   },
+   {
+    "week_start": "2026-11-02",
+    "muscles": {
+     "pectoral": {
+      "direct": 12,
+      "fractional": 12
+     },
+     "deltoides_lateral": {
+      "direct": 12,
+      "fractional": 12
+     },
+     "deltoides_posterior": {
+      "direct": 4,
+      "fractional": 6.5
+     },
+     "deltoides_anterior": {
+      "direct": 0,
+      "fractional": 4.5
+     },
+     "espalda": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "triceps": {
+      "direct": 6,
+      "fractional": 10.5
+     },
+     "biceps": {
+      "direct": 5,
+      "fractional": 10
+     },
+     "cuadriceps": {
+      "direct": 11,
+      "fractional": 11
+     },
+     "isquiotibiales": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "gluteos": {
+      "direct": 0,
+      "fractional": 4.5
+     },
+     "pantorrillas": {
+      "direct": 10,
+      "fractional": 10
+     }
+    }
+   },
+   {
+    "week_start": "2026-11-09",
+    "muscles": {
+     "pectoral": {
+      "direct": 12,
+      "fractional": 12
+     },
+     "deltoides_lateral": {
+      "direct": 9,
+      "fractional": 9
+     },
+     "deltoides_posterior": {
+      "direct": 4,
+      "fractional": 6.5
+     },
+     "deltoides_anterior": {
+      "direct": 0,
+      "fractional": 4.5
+     },
+     "espalda": {
+      "direct": 8,
+      "fractional": 8
+     },
+     "triceps": {
+      "direct": 6,
+      "fractional": 10.5
+     },
+     "biceps": {
+      "direct": 5,
+      "fractional": 9
+     },
+     "cuadriceps": {
+      "direct": 11,
+      "fractional": 11
+     },
+     "isquiotibiales": {
+      "direct": 10,
+      "fractional": 10
+     },
+     "gluteos": {
+      "direct": 0,
+      "fractional": 4.5
+     },
+     "pantorrillas": {
+      "direct": 10,
+      "fractional": 10
+     }
+    }
+   }
+  ],
+  "exercises": [
+   {
+    "exercise_id": "ex-banca",
+    "name": "Press de banca con barra",
+    "sessions_in_window": 4,
+    "status_app": "progresa",
+    "lost_reps_2_sessions": false,
+    "best_e1rm_kg": {
+     "value": 104.0,
+     "date": "2026-11-02"
+    },
+    "e1rm_by_week": [
+     98.7,
+     98.7,
+     101.3,
+     104.0
+    ],
+    "last_sessions": [
+     {
+      "date": "2026-11-16",
+      "sets": [
+       [
+        80,
+        9,
+        2
+       ],
+       [
+        80,
+        8,
+        2
+       ],
+       [
+        80,
+        7,
+        1
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-09",
+      "sets": [
+       [
+        80,
+        8,
+        2
+       ],
+       [
+        80,
+        8,
+        2
+       ],
+       [
+        80,
+        7,
+        1
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-02",
+      "sets": [
+       [
+        80,
+        8,
+        2
+       ],
+       [
+        80,
+        7,
+        2
+       ],
+       [
+        77.5,
+        8,
+        1
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "exercise_id": "ex-inclinado-barra",
+    "name": "Press inclinado con barra",
+    "sessions_in_window": 4,
+    "status_app": "mantiene",
+    "lost_reps_2_sessions": false,
+    "best_e1rm_kg": {
+     "value": 76.0,
+     "date": "2026-11-02"
+    },
+    "e1rm_by_week": [
+     76.0,
+     76.0,
+     76.0,
+     76.0
+    ],
+    "last_sessions": [
+     {
+      "date": "2026-11-16",
+      "sets": [
+       [
+        60,
+        8,
+        2
+       ],
+       [
+        60,
+        8,
+        1
+       ],
+       [
+        60,
+        7,
+        1
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-09",
+      "sets": [
+       [
+        60,
+        8,
+        2
+       ],
+       [
+        60,
+        7,
+        1
+       ],
+       [
+        60,
+        7,
+        1
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "exercise_id": "ex-remo-t",
+    "name": "Remo en T",
+    "sessions_in_window": 4,
+    "status_app": "estancado",
+    "lost_reps_2_sessions": false,
+    "best_e1rm_kg": {
+     "value": 73.3,
+     "date": "2026-11-02"
+    },
+    "e1rm_by_week": [
+     73.3,
+     73.3,
+     73.3,
+     73.3
+    ],
+    "last_sessions": [
+     {
+      "date": "2026-11-16",
+      "sets": [
+       [
+        55,
+        10,
+        2
+       ],
+       [
+        55,
+        9,
+        1
+       ],
+       [
+        55,
+        9,
+        1
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-09",
+      "sets": [
+       [
+        55,
+        10,
+        2
+       ],
+       [
+        55,
+        9,
+        1
+       ],
+       [
+        55,
+        8,
+        1
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-02",
+      "sets": [
+       [
+        55,
+        10,
+        2
+       ],
+       [
+        55,
+        10,
+        1
+       ],
+       [
+        55,
+        9,
+        1
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "exercise_id": "ex-laterales",
+    "name": "Elevaciones laterales (mancuerna o polea)",
+    "sessions_in_window": 4,
+    "status_app": "mantiene",
+    "lost_reps_2_sessions": false,
+    "best_e1rm_kg": null,
+    "e1rm_by_week": null,
+    "last_sessions": [
+     {
+      "date": "2026-11-16",
+      "sets": [
+       [
+        10,
+        14,
+        1
+       ],
+       [
+        10,
+        13,
+        1
+       ],
+       [
+        10,
+        12,
+        0
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-09",
+      "sets": [
+       [
+        10,
+        14,
+        1
+       ],
+       [
+        10,
+        13,
+        0
+       ],
+       [
+        10,
+        12,
+        0
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "exercise_id": "ex-prensa",
+    "name": "Prensa",
+    "sessions_in_window": 4,
+    "status_app": "progresa",
+    "lost_reps_2_sessions": false,
+    "best_e1rm_kg": {
+     "value": 246.7,
+     "date": "2026-11-02"
+    },
+    "e1rm_by_week": [
+     228.0,
+     234.0,
+     240.0,
+     246.7
+    ],
+    "last_sessions": [
+     {
+      "date": "2026-11-16",
+      "sets": [
+       [
+        185,
+        10,
+        2
+       ],
+       [
+        185,
+        9,
+        1
+       ],
+       [
+        180,
+        9,
+        1
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-09",
+      "sets": [
+       [
+        180,
+        10,
+        2
+       ],
+       [
+        180,
+        9,
+        1
+       ],
+       [
+        180,
+        8,
+        1
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "exercise_id": "ex-sentadilla",
+    "name": "Sentadilla con barra",
+    "sessions_in_window": 4,
+    "status_app": "retrocede",
+    "lost_reps_2_sessions": true,
+    "best_e1rm_kg": {
+     "value": 117.0,
+     "date": "2026-11-02"
+    },
+    "e1rm_by_week": [
+     117.0,
+     117.0,
+     111.0,
+     108.0
+    ],
+    "last_sessions": [
+     {
+      "date": "2026-11-16",
+      "sets": [
+       [
+        90,
+        6,
+        2
+       ],
+       [
+        90,
+        6,
+        2
+       ],
+       [
+        90,
+        5,
+        2
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-09",
+      "sets": [
+       [
+        90,
+        7,
+        2
+       ],
+       [
+        90,
+        6,
+        2
+       ],
+       [
+        90,
+        6,
+        2
+       ]
+      ]
+     },
+     {
+      "date": "2026-11-02",
+      "sets": [
+       [
+        95,
+        7,
+        2
+       ],
+       [
+        95,
+        6,
+        2
+       ],
+       [
+        90,
+        7,
+        2
+       ]
+      ]
+     }
+    ]
+   }
+  ],
+  "body_weight": {
+   "weekly_avg_kg": [
+    73.0,
+    72.7,
+    72.4,
+    72.1
+   ],
+   "change_pct_per_week": [
+    -0.4,
+    -0.4,
+    -0.4
+   ]
+  },
+  "recovery": {
+   "avg_sleep_h": 7.3,
+   "discomfort": [
+    {
+     "date": "2026-11-12",
+     "text": "dolor en el hombro derecho al bajar en el press inclinado, sigue al otro día"
+    }
+   ]
+  },
+  "data_quality": {
+   "sets_total": 296,
+   "rir_logged_pct": 0.86
+  }
+ },
+ "request": {
+  "type": "analisis"
+ }
+}

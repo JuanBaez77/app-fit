@@ -25,10 +25,10 @@ Arma el texto que la API le pasa a Claude como contexto:
   - `latest.json`, el manifiesto.
 - **Esquema:** avisa si la versión del esquema de `CLAUDE.md` deja de ser la 6, para que revises el prompt.
 
-Tokens: muestra una estimación por bytes. El número real lo da la API a partir de PR-17.
+Tokens: muestra una estimación por bytes. El número real: `sh scripts/brain-analyze.sh CASO.json --count-only` (no gasta).
 
 Tests: `py -m unittest discover -s brain/tests` (los corre el hook pre-push).
 
-## Próximamente
+## Casos del prompt (PR-17)
 
-- `cases/` (PR-17): los 6 casos de prueba del prompt y sus resultados.
+`cases/` tiene los 6 casos de la sección 5 del diseño (números ilustrativos, `make_cases.py` los regenera) y `RESULTADOS.md` para anotar qué hizo cada modelo. Se corren con `sh scripts/brain-analyze.sh CASO.json`, que llama a la API desde el contenedor de la api con el bundle de `out/`. El prompt y el esquema de salida viven en `api/app/brain/`, para que la app use exactamente lo mismo (PR-26).
