@@ -29,7 +29,7 @@ La revisión de la rutina del **17 nov** cae en S3 y no depende de la app: se ha
 - Rama desde `main` con nombre `tipo/descripcion` (`feat/`, `fix/`, `chore/`, `ops/`, `perf/`); squash merge.
 - La descripción lleva: tarea (T#), historias (US-#), cómo probarlo y captura si toca pantalla.
 - **Listo para mergear** cuando:
-  - el CI está verde y lo nuevo tiene tests;
+  - `make check` pasa en local, el CI está verde y lo nuevo tiene tests;
   - si hay migración, también baja (`alembic downgrade -1`);
   - si toca el registro, se probó en modo avión;
   - si toca una pantalla de registro, se probó en tu celular;
@@ -71,10 +71,15 @@ Seis cosas que aparecieron al bajar el diseño a PRs. Ya están incorporadas a l
 - [ ] `docker-compose.yml` de desarrollo con `db` (PostgreSQL), `api` y `nginx`.
 - [ ] `Makefile` con `up`, `down`, `migrate`, `test`, `lint`, `fmt`.
 - [ ] Linters: ruff y mypy en `api/`; eslint, prettier y `tsc` en `web/`.
-- [ ] CI en GitHub Actions: lint y tests de `api/` y `web/` en cada PR (+1 h, no estaba en el diseño).
+- [ ] CI en GitHub Actions, mínimo para cuidar los minutos (+1 h, no estaba en el diseño):
+  - corre solo en PRs listos, nunca en borradores ni en push a `main`;
+  - solo para la parte que cambió (`api/` o `web/`);
+  - un commit nuevo cancela la corrida anterior.
+- [ ] `make check`, que corre en local lo mismo que el CI.
 - [ ] `.env.example`, `.gitignore` y un README con cómo levantar todo.
+- [ ] Esqueletos mínimos de `api/` (`/health` sin base) y `web/` (vitest y Testing Library ya configurados), para que haya algo que levantar y testear.
 
-**Listo cuando:** `make up` levanta los tres servicios y el CI pasa en un PR vacío.
+**Listo cuando:** `make up` levanta los tres servicios, `make check` pasa y el CI pasa en el PR.
 
 #### PR-02 · `feat/api-base` · T0.2 · 2 h
 - [ ] FastAPI con configuración por `pydantic-settings`, SQLAlchemy 2 y psycopg 3.
@@ -99,7 +104,7 @@ Seis cosas que aparecieron al bajar el diseño a PRs. Ya están incorporadas a l
 - [ ] Router y barra inferior con Hoy, Calendario, Progreso y Análisis (vacías).
 - [ ] Pantalla de login. Cliente HTTP con el token de acceso en memoria y refresh automático ante un 401.
 - [ ] Base visual: contraste alto (a pleno sol) y áreas táctiles de 48 px o más.
-- [ ] vitest y Testing Library configurados.
+- [ ] Tests de la pantalla de login (vitest y Testing Library vienen de PR-01).
 
 **Listo cuando:** Chrome la marca como instalable y el login anda contra el API local.
 

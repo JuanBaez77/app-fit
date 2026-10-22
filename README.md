@@ -1,0 +1,45 @@
+# app-fit
+
+PWA mobile-first y offline-first para registrar el entrenamiento en el gimnasio, conectada al brain de hipertrofia. Uso personal.
+
+- Diseño: [docs/diseno-resumen.md](docs/diseno-resumen.md) y [docs/diseno-completo.md](docs/diseno-completo.md)
+- Plan de sprints y PRs: [docs/sprints.md](docs/sprints.md)
+
+## Estructura
+
+| Carpeta | Qué hay |
+| --- | --- |
+| `api/` | FastAPI (Python 3.12, uv). Corre en Docker |
+| `web/` | PWA con React, Vite y TypeScript (Node 22) |
+| `brain/` | Scripts que corren en tu PC contra el vault del brain |
+| `nginx/` | Configuración de nginx |
+| `docs/` | Diseño y plan |
+
+## Requisitos
+
+- Docker Desktop
+- Node 22 (`web/.nvmrc`)
+- GNU make. En Windows: `winget install ezwinports.make`, y usalo desde Git Bash
+
+No hace falta Python local: lint y tests de la API corren dentro del contenedor.
+
+## Uso
+
+```bash
+make up          # db, api y nginx
+make web         # Vite con recarga en caliente: http://localhost:5173
+make check       # lint, formato, tipos y tests de api y web
+make help        # todos los comandos
+```
+
+| URL | Qué es |
+| --- | --- |
+| http://localhost:5173 | Vite (desarrollo). `/api` va al contenedor de la API |
+| http://localhost:8000/health | API directo |
+| http://localhost:8080 | nginx sirviendo el build (`make web-build`), como en producción |
+
+Para cambiar usuarios, contraseñas o puertos, copiá `.env.example` a `.env`.
+
+## CI
+
+GitHub Actions corre solo en PRs listos (no en borradores ni en push a `main`), solo para la parte que cambió (`api/` o `web/`), y un commit nuevo cancela la corrida anterior. Los minutos de un repo privado son limitados: corré `make check` antes de pushear.
