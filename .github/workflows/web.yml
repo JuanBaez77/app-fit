@@ -1,6 +1,7 @@
 # Minutos de Actions contados: solo en PRs listos (no en borradores ni en push a main),
 # solo si cambia web/, y un commit nuevo cancela la corrida anterior.
-# Antes de pushear, make check corre lo mismo en tu máquina.
+# Desactivado con gh workflow disable mientras no haya minutos: el hook pre-push
+# (.githooks/pre-push) corre lo mismo en local.
 name: web
 
 on:

@@ -29,7 +29,7 @@ La revisión de la rutina del **17 nov** cae en S3 y no depende de la app: se ha
 - Rama desde `main` con nombre `tipo/descripcion` (`feat/`, `fix/`, `chore/`, `ops/`, `perf/`); squash merge.
 - La descripción lleva: tarea (T#), historias (US-#), cómo probarlo y captura si toca pantalla.
 - **Listo para mergear** cuando:
-  - `make check` pasa en local, el CI está verde y lo nuevo tiene tests;
+  - el hook pre-push pasa (corre `scripts/check.sh`) y lo nuevo tiene tests;
   - si hay migración, también baja (`alembic downgrade -1`);
   - si toca el registro, se probó en modo avión;
   - si toca una pantalla de registro, se probó en tu celular;
@@ -75,11 +75,12 @@ Seis cosas que aparecieron al bajar el diseño a PRs. Ya están incorporadas a l
   - corre solo en PRs listos, nunca en borradores ni en push a `main`;
   - solo para la parte que cambió (`api/` o `web/`);
   - un commit nuevo cancela la corrida anterior.
-- [ ] `make check`, que corre en local lo mismo que el CI.
+- [ ] `scripts/check.sh`, que corre en local lo mismo que el CI, y un hook pre-push que lo corre para la parte que cambió (sin depender de make).
+- [ ] Workflows desactivados con `gh workflow disable` mientras Actions esté bloqueado por facturación.
 - [ ] `.env.example`, `.gitignore` y un README con cómo levantar todo.
 - [ ] Esqueletos mínimos de `api/` (`/health` sin base) y `web/` (vitest y Testing Library ya configurados), para que haya algo que levantar y testear.
 
-**Listo cuando:** `make up` levanta los tres servicios, `make check` pasa y el CI pasa en el PR.
+**Listo cuando:** `make up` levanta los tres servicios, `scripts/check.sh` pasa y el hook frena un push con un check roto.
 
 #### PR-02 · `feat/api-base` · T0.2 · 2 h
 - [ ] FastAPI con configuración por `pydantic-settings`, SQLAlchemy 2 y psycopg 3.

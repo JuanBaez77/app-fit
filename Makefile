@@ -30,7 +30,8 @@ web: ## Vite con recarga en caliente en http://localhost:5173
 web-build: ## Build de la PWA, que nginx sirve en http://localhost:8080
 	cd web && npm run build
 
-check: lint test ## Todo lo que corre el CI: correlo antes de pushear
+check: ## Lo mismo que el hook pre-push: lint, formato, tipos, tests y build
+	sh scripts/check.sh
 
 lint: lint-api lint-web ## Lint, formato y tipos de api y web
 

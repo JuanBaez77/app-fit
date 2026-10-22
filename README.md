@@ -25,6 +25,12 @@ No hace falta Python local: lint y tests de la API corren dentro del contenedor.
 
 ## Uso
 
+Una vez por clon, activá el hook pre-push:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ```bash
 make up          # db, api y nginx
 make web         # Vite con recarga en caliente: http://localhost:5173
@@ -40,6 +46,19 @@ make help        # todos los comandos
 
 Para cambiar usuarios, contraseñas o puertos, copiá `.env.example` a `.env`.
 
-## CI
+## Checks antes de pushear
 
-GitHub Actions corre solo en PRs listos (no en borradores ni en push a `main`), solo para la parte que cambió (`api/` o `web/`), y un commit nuevo cancela la corrida anterior. Los minutos de un repo privado son limitados: corré `make check` antes de pushear.
+El hook [`.githooks/pre-push`](.githooks/pre-push) corre [`scripts/check.sh`](scripts/check.sh) solo para la parte que cambió (`api/` o `web/`) y frena el push si algo falla. Revisa lint, formato, tipos, tests y el build de la web. La API se chequea en Docker, así que Docker Desktop tiene que estar abierto. No depende de make.
+
+```bash
+sh scripts/check.sh          # todo, a mano
+sh scripts/check.sh web      # solo una parte
+git push --no-verify         # saltear el hook en una emergencia
+```
+
+Los workflows de GitHub Actions (`.github/workflows/`) corren lo mismo, pero están **desactivados** porque los minutos son pagos. Para volver a usarlos:
+
+```bash
+gh workflow enable api
+gh workflow enable web
+```
