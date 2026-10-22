@@ -1,0 +1,369 @@
+{
+ "description": "1RM estimado con Epley (peso × (1 + reps / 30)), solo con 12 repeticiones o menos y en ejercicios que lo admiten. La mejor marca ignora lo borrado.",
+ "exercises": [
+  {
+   "id": "press-banca-barra",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pectoral",
+     "factor": 1
+    },
+    {
+     "muscle_id": "deltoides_anterior",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "triceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "press-inclinado-mancuernas",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pectoral",
+     "factor": 1
+    },
+    {
+     "muscle_id": "deltoides_anterior",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "triceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "press-inclinado-barra",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pectoral",
+     "factor": 1
+    },
+    {
+     "muscle_id": "deltoides_anterior",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "triceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "cruces-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pectoral",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "remo-t",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "espalda",
+     "factor": 1
+    },
+    {
+     "muscle_id": "biceps",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "deltoides_posterior",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "remo-sentado-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "espalda",
+     "factor": 1
+    },
+    {
+     "muscle_id": "biceps",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "deltoides_posterior",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "jalon-pecho",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "espalda",
+     "factor": 1
+    },
+    {
+     "muscle_id": "biceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "dominadas",
+   "e1rm_eligible": false,
+   "muscles": [
+    {
+     "muscle_id": "espalda",
+     "factor": 1
+    },
+    {
+     "muscle_id": "biceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "elevaciones-laterales",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "deltoides_lateral",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "elevaciones-laterales-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "deltoides_lateral",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "aperturas-invertidas-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "deltoides_posterior",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "extension-triceps-cabeza",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "triceps",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "curl-mancuernas",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "biceps",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "curl-barra-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "biceps",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "prensa",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "cuadriceps",
+     "factor": 1
+    },
+    {
+     "muscle_id": "gluteos",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "sentadilla",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "cuadriceps",
+     "factor": 1
+    },
+    {
+     "muscle_id": "gluteos",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "extension-cuadriceps",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "cuadriceps",
+     "factor": 1
+    },
+    {
+     "muscle_id": "recto_femoral",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "curl-femoral-acostado",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "isquiotibiales",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "peso-muerto-rumano",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "isquiotibiales",
+     "factor": 1
+    },
+    {
+     "muscle_id": "gluteos",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "elevacion-talones-pie",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pantorrillas",
+     "factor": 1
+    }
+   ]
+  }
+ ],
+ "sessions": [
+  {
+   "id": "s1",
+   "date": "2026-11-02",
+   "deleted_at": null
+  },
+  {
+   "id": "s2",
+   "date": "2026-11-05",
+   "deleted_at": null
+  }
+ ],
+ "sets": [
+  {
+   "id": "set-1",
+   "session_id": "s1",
+   "exercise_id": "press-banca-barra",
+   "set_number": 1,
+   "weight_kg": 80,
+   "reps": 8,
+   "rir": 1,
+   "deleted_at": null
+  },
+  {
+   "id": "set-2",
+   "session_id": "s1",
+   "exercise_id": "press-banca-barra",
+   "set_number": 2,
+   "weight_kg": 80,
+   "reps": 9,
+   "rir": 1,
+   "deleted_at": null
+  },
+  {
+   "id": "set-3",
+   "session_id": "s2",
+   "exercise_id": "press-banca-barra",
+   "set_number": 1,
+   "weight_kg": 100,
+   "reps": 1,
+   "rir": 1,
+   "deleted_at": null
+  },
+  {
+   "id": "set-4",
+   "session_id": "s2",
+   "exercise_id": "press-banca-barra",
+   "set_number": 2,
+   "weight_kg": 70,
+   "reps": 15,
+   "rir": 1,
+   "deleted_at": null
+  },
+  {
+   "id": "set-5",
+   "session_id": "s2",
+   "exercise_id": "press-banca-barra",
+   "set_number": 3,
+   "weight_kg": 90,
+   "reps": 5,
+   "rir": 1,
+   "deleted_at": "2026-11-08T12:00:00Z"
+  },
+  {
+   "id": "set-6",
+   "session_id": "s1",
+   "exercise_id": "dominadas",
+   "set_number": 1,
+   "weight_kg": 10,
+   "reps": 8,
+   "rir": 1,
+   "deleted_at": null
+  },
+  {
+   "id": "set-7",
+   "session_id": "s1",
+   "exercise_id": "curl-mancuernas",
+   "set_number": 1,
+   "weight_kg": 14,
+   "reps": 13,
+   "rir": 1,
+   "deleted_at": null
+  }
+ ],
+ "expected": {
+  "e1rm_by_set": {
+   "set-1": 101.3333,
+   "set-2": 104.0,
+   "set-3": 103.3333,
+   "set-4": null,
+   "set-5": 105.0,
+   "set-6": null,
+   "set-7": null
+  },
+  "best_e1rm": {
+   "press-banca-barra": 104.0,
+   "dominadas": null,
+   "curl-mancuernas": null
+  }
+ }
+}

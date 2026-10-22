@@ -9,6 +9,7 @@ import {
   prefill,
   routineWeek,
   targetSets,
+  weekStart,
 } from './index'
 
 function session(id: string, date: string, extra: Partial<Session> = {}): Session {
@@ -152,5 +153,14 @@ describe('mejor marca sin 1RM estimado', () => {
 
     expect(best?.set.id).toBe('s2-1')
     expect(best?.e1rm).toBeNull()
+  })
+})
+
+describe('weekStart', () => {
+  test('la semana empieza el lunes', () => {
+    expect(weekStart('2026-11-02')).toBe('2026-11-02')
+    expect(weekStart('2026-11-08')).toBe('2026-11-02')
+    expect(weekStart('2026-11-09')).toBe('2026-11-09')
+    expect(weekStart('2027-01-01')).toBe('2026-12-28')
   })
 })
