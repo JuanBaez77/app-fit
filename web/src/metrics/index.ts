@@ -126,3 +126,54 @@ export function targetSets(
   if (item.ramp_sets && item.ramp_weeks && week <= item.ramp_weeks) return item.ramp_sets
   return item.target_sets
 }
+
+export interface MuscleVolume {
+  /** Series con factor 1 */
+  direct: number
+  /** Suma de factores: la indirecta vale 0,5 */
+  fractional: number
+}
+
+/** muscle_id -> volumen. Un músculo sin series en la semana no aparece. */
+export type WeeklyVolume = Record<string, MuscleVolume>
+
+type VolumeSet = Pick<SetLog, 'session_id' | 'exercise_id' | 'deleted_at'>
+type VolumeSession = Pick<Session, 'date' | 'deleted_at'>
+type VolumeExercise = { muscles: { muscle_id: string; factor: number }[] }
+
+/** El lunes de la semana de una fecha local. */
+export function weekStart(date: LocalDate): LocalDate {
+  const day = parseLocalDate(date)
+  day.setDate(day.getDate() - ((day.getDay() + 6) % 7))
+  const m = String(day.getMonth() + 1).padStart(2, '0')
+  const d = String(day.getDate()).padStart(2, '0')
+  return `${day.getFullYear()}-${m}-${d}`
+}
+
+/**
+ * Volumen por músculo y por semana (lunes a domingo, según la fecha de la sesión), con el mapa
+ * de factores de cada ejercicio. No se guarda: cambiar un factor corrige todo el historial.
+ */
+export function weeklyVolume(
+  sets: VolumeSet[],
+  sessions: Map<string, VolumeSession>,
+  exercises: Map<string, VolumeExercise>,
+): Map<LocalDate, WeeklyVolume> {
+  const weeks = new Map<LocalDate, WeeklyVolume>()
+  for (const set of sets) {
+    const session = sessions.get(set.session_id)
+    const exercise = exercises.get(set.exercise_id)
+    if (set.deleted_at || !session || session.deleted_at || !exercise) continue
+    const week = weekStart(session.date)
+    const volume = weeks.get(week) ?? {}
+    for (const { muscle_id, factor } of exercise.muscles) {
+      const current = volume[muscle_id] ?? { direct: 0, fractional: 0 }
+      volume[muscle_id] = {
+        direct: current.direct + (factor === 1 ? 1 : 0),
+        fractional: current.fractional + factor,
+      }
+    }
+    weeks.set(week, volume)
+  }
+  return weeks
+}

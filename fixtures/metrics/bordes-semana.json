@@ -1,0 +1,376 @@
+{
+ "description": "Semanas de lunes a domingo; las series y las sesiones borradas no cuentan; un músculo sin series en la semana no aparece.",
+ "exercises": [
+  {
+   "id": "press-banca-barra",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pectoral",
+     "factor": 1
+    },
+    {
+     "muscle_id": "deltoides_anterior",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "triceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "press-inclinado-mancuernas",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pectoral",
+     "factor": 1
+    },
+    {
+     "muscle_id": "deltoides_anterior",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "triceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "press-inclinado-barra",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pectoral",
+     "factor": 1
+    },
+    {
+     "muscle_id": "deltoides_anterior",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "triceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "cruces-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pectoral",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "remo-t",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "espalda",
+     "factor": 1
+    },
+    {
+     "muscle_id": "biceps",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "deltoides_posterior",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "remo-sentado-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "espalda",
+     "factor": 1
+    },
+    {
+     "muscle_id": "biceps",
+     "factor": 0.5
+    },
+    {
+     "muscle_id": "deltoides_posterior",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "jalon-pecho",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "espalda",
+     "factor": 1
+    },
+    {
+     "muscle_id": "biceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "dominadas",
+   "e1rm_eligible": false,
+   "muscles": [
+    {
+     "muscle_id": "espalda",
+     "factor": 1
+    },
+    {
+     "muscle_id": "biceps",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "elevaciones-laterales",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "deltoides_lateral",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "elevaciones-laterales-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "deltoides_lateral",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "aperturas-invertidas-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "deltoides_posterior",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "extension-triceps-cabeza",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "triceps",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "curl-mancuernas",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "biceps",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "curl-barra-polea",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "biceps",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "prensa",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "cuadriceps",
+     "factor": 1
+    },
+    {
+     "muscle_id": "gluteos",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "sentadilla",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "cuadriceps",
+     "factor": 1
+    },
+    {
+     "muscle_id": "gluteos",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "extension-cuadriceps",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "cuadriceps",
+     "factor": 1
+    },
+    {
+     "muscle_id": "recto_femoral",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "curl-femoral-acostado",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "isquiotibiales",
+     "factor": 1
+    }
+   ]
+  },
+  {
+   "id": "peso-muerto-rumano",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "isquiotibiales",
+     "factor": 1
+    },
+    {
+     "muscle_id": "gluteos",
+     "factor": 0.5
+    }
+   ]
+  },
+  {
+   "id": "elevacion-talones-pie",
+   "e1rm_eligible": true,
+   "muscles": [
+    {
+     "muscle_id": "pantorrillas",
+     "factor": 1
+    }
+   ]
+  }
+ ],
+ "sessions": [
+  {
+   "id": "domingo",
+   "date": "2026-11-08",
+   "deleted_at": null
+  },
+  {
+   "id": "lunes",
+   "date": "2026-11-09",
+   "deleted_at": null
+  },
+  {
+   "id": "borrada",
+   "date": "2026-11-04",
+   "deleted_at": "2026-11-08T12:00:00Z"
+  }
+ ],
+ "sets": [
+  {
+   "id": "set-1",
+   "session_id": "domingo",
+   "exercise_id": "press-banca-barra",
+   "set_number": 1,
+   "weight_kg": 50,
+   "reps": 10,
+   "rir": 1,
+   "deleted_at": null
+  },
+  {
+   "id": "set-2",
+   "session_id": "domingo",
+   "exercise_id": "press-banca-barra",
+   "set_number": 2,
+   "weight_kg": 50,
+   "reps": 10,
+   "rir": 1,
+   "deleted_at": "2026-11-08T12:00:00Z"
+  },
+  {
+   "id": "set-3",
+   "session_id": "borrada",
+   "exercise_id": "cruces-polea",
+   "set_number": 1,
+   "weight_kg": 50,
+   "reps": 10,
+   "rir": 1,
+   "deleted_at": null
+  },
+  {
+   "id": "set-4",
+   "session_id": "lunes",
+   "exercise_id": "remo-t",
+   "set_number": 1,
+   "weight_kg": 50,
+   "reps": 10,
+   "rir": 1,
+   "deleted_at": null
+  },
+  {
+   "id": "set-5",
+   "session_id": "lunes",
+   "exercise_id": "remo-t",
+   "set_number": 2,
+   "weight_kg": 50,
+   "reps": 10,
+   "rir": 1,
+   "deleted_at": null
+  }
+ ],
+ "expected": {
+  "weekly_volume": [
+   {
+    "week_start": "2026-11-02",
+    "muscles": {
+     "pectoral": {
+      "direct": 1,
+      "fractional": 1
+     },
+     "deltoides_anterior": {
+      "direct": 0,
+      "fractional": 0.5
+     },
+     "triceps": {
+      "direct": 0,
+      "fractional": 0.5
+     }
+    }
+   },
+   {
+    "week_start": "2026-11-09",
+    "muscles": {
+     "espalda": {
+      "direct": 2,
+      "fractional": 2
+     },
+     "biceps": {
+      "direct": 0,
+      "fractional": 1
+     },
+     "deltoides_posterior": {
+      "direct": 0,
+      "fractional": 1
+     }
+    }
+   }
+  ]
+ }
+}
