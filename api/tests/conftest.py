@@ -49,6 +49,8 @@ def engine() -> Iterator[Engine]:
     command.upgrade(config, "head")
     command.downgrade(config, "base")
     command.upgrade(config, "head")
+    # Los modelos y las migraciones no pueden divergir
+    command.check(config)
 
     test_engine = create_engine(url)
     yield test_engine
