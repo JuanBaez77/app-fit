@@ -5,9 +5,11 @@ description = "API de app-fit: registro de entrenamiento y análisis con el brai
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "alembic>=1.20.1",
+    "argon2-cffi>=25.1.0",
     "fastapi>=0.159.1",
     "psycopg[binary]>=3.3.6",
     "pydantic-settings>=2.16.1",
+    "pyjwt>=2.15.1",
     "sqlalchemy>=2.1.6",
     "uvicorn[standard]>=0.54.0",
 ]
