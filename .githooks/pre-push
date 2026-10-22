@@ -35,9 +35,10 @@ done
 parts=""
 if echo "$changed" | grep -q '^api/'; then parts="$parts api"; fi
 if echo "$changed" | grep -q '^web/'; then parts="$parts web"; fi
+if echo "$changed" | grep -q '^brain/'; then parts="$parts brain"; fi
 
 if [ -z "$parts" ]; then
-  echo "pre-push: no hay cambios en api/ ni web/, sin checks."
+  echo "pre-push: no hay cambios en api/, web/ ni brain/, sin checks."
   exit 0
 fi
 
