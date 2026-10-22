@@ -1,0 +1,121 @@
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes } from 'react-router'
+import { expect, test } from 'vitest'
+import { db } from '../db/db'
+import type { Session, SetLog } from '../db/types'
+import { EXERCISES, routine, STAMP } from '../test-data'
+import SessionPage from './SessionPage'
+
+function session(id: string, date: string): Session {
+  return {
+    id,
+    routine_id: 'r1',
+    routine_day_id: 'd-torso',
+    date,
+    started_at: `${date}T21:00:00.000Z`,
+    ended_at: null,
+    sleep_hours: null,
+    discomfort: null,
+    updated_at: STAMP,
+    deleted_at: null,
+  }
+}
+
+function set(sessionId: string, n: number, weight: number, reps: number): SetLog {
+  return {
+    id: `${sessionId}-${n}`,
+    session_id: sessionId,
+    exercise_id: 'ex-banca',
+    routine_day_exercise_id: 'rde-banca',
+    set_number: n,
+    weight_kg: weight,
+    reps,
+    rir: 2,
+    interaction_ms: null,
+    logged_at: `2026-10-${sessionId === 'hoy' ? 26 : 19}T21:0${n}:00.000Z`,
+    updated_at: STAMP,
+    deleted_at: null,
+  }
+}
+
+async function seed(extraRoutine = {}) {
+  await db.routines.put(routine(extraRoutine))
+  await db.exercises.bulkPut(EXERCISES)
+  await db.sessions.bulkPut([session('antes', '2026-10-19'), session('hoy', '2026-10-26')])
+  await db.set_logs.bulkPut([
+    set('antes', 1, 80, 8),
+    set('antes', 2, 80, 8),
+    set('antes', 3, 80, 7),
+  ])
+}
+
+function renderSession(id = 'hoy') {
+  return render(
+    <MemoryRouter initialEntries={[`/sesion/${id}`]}>
+      <Routes>
+        <Route path="/sesion/:id" element={<SessionPage />} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
+test('muestra qué toca, la última vez, la mejor marca y precarga la serie 1', async () => {
+  await seed()
+  renderSession()
+
+  const card = await screen.findByRole('region', { name: 'Press de banca con barra' })
+  expect(within(card).getByText('1 / 2')).toBeInTheDocument()
+  expect(within(card).getByText('3 × 6–10 · RIR 1–2 · desc. 2–3 min')).toBeInTheDocument()
+  expect(within(card).getByText('Última vez').nextElementSibling).toHaveTextContent(
+    '80×8 80×8 80×7',
+  )
+  expect(within(card).getByText('80×8 (1RM ≈ 101,3 kg)')).toBeInTheDocument()
+  expect(within(card).getByText('80 kg × 8')).toBeInTheDocument()
+})
+
+test('las series de hoy llevan el indicador contra la misma serie de la última vez', async () => {
+  await seed()
+  await db.set_logs.bulkPut([set('hoy', 1, 80, 9), set('hoy', 2, 77.5, 8)])
+  renderSession()
+
+  expect(await screen.findByLabelText('mejora')).toBeInTheDocument()
+  expect(screen.getByLabelText('retroceso')).toBeInTheDocument()
+  // La serie 3 se precarga con la 3 de la última vez
+  expect(screen.getByText('80 kg × 7')).toBeInTheDocument()
+})
+
+test('se puede pasar a otro ejercicio; sin historial dice Primera vez', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Remo en T' }))
+
+  const card = await screen.findByRole('region', { name: 'Remo en T' })
+  expect(within(card).getByText('Primera vez')).toBeInTheDocument()
+  expect(within(card).getByText('Sin historial')).toBeInTheDocument()
+})
+
+test('en la semana 1 usa las series de la rampa', async () => {
+  const base = routine()
+  const torso = base.days[0]!
+  await seed({
+    start_on: '2026-10-26',
+    days: [
+      {
+        ...torso,
+        exercises: [{ ...torso.exercises[0]!, ramp_sets: 2, ramp_weeks: 2 }, torso.exercises[1]!],
+      },
+      base.days[1]!,
+    ],
+  })
+  renderSession()
+
+  expect(await screen.findByText('2 × 6–10 · RIR 1–2 · desc. 2–3 min')).toBeInTheDocument()
+})
+
+test('sesión inexistente', async () => {
+  renderSession('no-existe')
+
+  expect(await screen.findByText('No encontré esa sesión.')).toBeInTheDocument()
+})
