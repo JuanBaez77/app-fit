@@ -55,6 +55,7 @@ function renderSession(id = 'hoy') {
     <MemoryRouter initialEntries={[`/sesion/${id}`]}>
       <Routes>
         <Route path="/sesion/:id" element={<SessionPage />} />
+        <Route path="/" element={<p>Pantalla Hoy</p>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -246,4 +247,42 @@ test('un ejercicio fuera de rutina se agrega desde el catálogo', async () => {
   expect(await todaySets()).toMatchObject([
     { exercise_id: 'ex-prensa', routine_day_exercise_id: null },
   ])
+})
+
+test('terminar la sesión guarda sueño y molestias y vuelve a Hoy', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Terminar' }))
+  await userEvent.type(screen.getByLabelText(/Horas de sueño/), '7,5')
+  await userEvent.type(screen.getByLabelText(/Molestias/), '  hombro derecho ')
+  await userEvent.click(screen.getByRole('button', { name: 'Terminar sesión' }))
+
+  expect(await screen.findByText('Pantalla Hoy')).toBeInTheDocument()
+  const saved = await db.sessions.get('hoy')
+  expect(saved).toMatchObject({ sleep_hours: 7.5, discomfort: 'hombro derecho' })
+  expect(saved?.ended_at).toEqual(expect.any(String))
+})
+
+test('terminar sin completar nada también cierra', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Terminar' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Terminar sesión' }))
+
+  await screen.findByText('Pantalla Hoy')
+  expect(await db.sessions.get('hoy')).toMatchObject({ sleep_hours: null, discomfort: null })
+})
+
+test('horas de sueño fuera de rango', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Terminar' }))
+  await userEvent.type(screen.getByLabelText(/Horas de sueño/), '30')
+  await userEvent.click(screen.getByRole('button', { name: 'Terminar sesión' }))
+
+  expect(await screen.findByRole('alert')).toHaveTextContent('de 0 a 24')
+  expect((await db.sessions.get('hoy'))?.ended_at).toBeNull()
 })
