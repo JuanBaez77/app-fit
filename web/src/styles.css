@@ -472,3 +472,22 @@ button.danger {
 .picker button {
   text-align: left;
 }
+
+/* Cierre de la sesión */
+.finish {
+  display: grid;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.finish label {
+  display: grid;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.finish-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}

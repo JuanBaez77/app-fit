@@ -1,11 +1,13 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import ExerciseCard from '../components/ExerciseCard'
+import FinishSession from '../components/FinishSession'
 import SetPanel from '../components/SetPanel'
 import SyncBadge from '../components/SyncBadge'
 import UndoToast from '../components/UndoToast'
 import { useExerciseHistory, useExercises, useProfile, useSession } from '../data/hooks'
+import { finishSession } from '../data/sessions'
 import { deleteSet, logSet, restoreSet, updateSet, type SetValues } from '../data/sets'
 import { db } from '../db/db'
 import type { Exercise, RoutineDayExercise, SetLog } from '../db/types'
@@ -43,6 +45,8 @@ export default function SessionPage() {
   const [addedExtras, setAddedExtras] = useState<string[]>([])
   const [picking, setPicking] = useState(false)
   const [undo, setUndo] = useState<SetLog | null>(null)
+  const [finishing, setFinishing] = useState(false)
+  const navigate = useNavigate()
   const closeUndo = useCallback(() => setUndo(null), [])
 
   if (session === undefined || routine === undefined || !exercises || !setsToday) return null
@@ -99,9 +103,25 @@ export default function SessionPage() {
         <h1>
           {day?.name ?? 'Sesión'} · {shortDate(session.date)}
         </h1>
+        {!session.ended_at && !finishing && (
+          <button type="button" className="link" onClick={() => setFinishing(true)}>
+            Terminar
+          </button>
+        )}
       </header>
+      {session.ended_at && <p className="notice">Sesión cerrada. Podés corregir las series.</p>}
 
-      {current && exercises.get(current.exerciseId) && (
+      {finishing && (
+        <FinishSession
+          onCancel={() => setFinishing(false)}
+          onFinish={async (close) => {
+            await finishSession(session, close)
+            navigate('/')
+          }}
+        />
+      )}
+
+      {!finishing && current && exercises.get(current.exerciseId) && (
         <CurrentExercise
           key={current.key}
           entry={current}
