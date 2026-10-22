@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import HoyPage from './pages/HoyPage'
 import LoginPage from './pages/LoginPage'
 import Placeholder from './pages/Placeholder'
+import SessionPage from './pages/SessionPage'
 import SyncProvider from './sync/SyncProvider'
 
 export default function App() {
@@ -18,6 +19,8 @@ export default function App() {
   return (
     <SyncProvider userId={state.user.id}>
       <Routes>
+        {/* El registro ocupa toda la pantalla, sin la barra inferior */}
+        <Route path="sesion/:id" element={<SessionPage />} />
         <Route element={<Layout />}>
           <Route index element={<HoyPage />} />
           <Route path="calendario" element={<Placeholder title="Calendario" comingIn="PR-19" />} />
