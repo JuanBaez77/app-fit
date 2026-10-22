@@ -25,6 +25,7 @@ RUN uv sync --frozen --no-dev \
     && useradd --system --uid 10001 --no-create-home appfit
 COPY alembic.ini ./
 COPY migrations ./migrations
+COPY seeds ./seeds
 COPY app ./app
 USER appfit
 EXPOSE 8000

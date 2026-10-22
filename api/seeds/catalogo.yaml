@@ -1,0 +1,104 @@
+# Catálogo inicial: los ejercicios de rutina-2026-10-20 con sus músculos.
+# Factores del conteo fraccional del brain: 1 = serie directa, 0.5 = indirecta.
+# Las excepciones de la wiki son músculos que NO figuran:
+#   - el press de banca no cuenta para el deltoides lateral
+#     ([[press-de-banca-hace-crecer-el-deltoides-anterior-no-el-medio]]);
+#   - la prensa y la sentadilla no cuentan para el recto femoral
+#     ([[los-multiarticulares-de-pierna-casi-no-hacen-crecer-el-recto-femoral]]).
+# brain_page: página de wiki/ejercicios, si existe.
+
+ejercicios:
+  press-banca-barra:
+    nombre: Press de banca con barra
+    tipo: multiarticular
+    brain_page: press-de-banca
+    musculos: { pectoral: 1, deltoides_anterior: 0.5, triceps: 0.5 }
+  press-inclinado-mancuernas:
+    nombre: Press inclinado con mancuernas
+    tipo: multiarticular
+    brain_page: press-inclinado
+    musculos: { pectoral: 1, deltoides_anterior: 0.5, triceps: 0.5 }
+  press-inclinado-barra:
+    nombre: Press inclinado con barra
+    tipo: multiarticular
+    brain_page: press-inclinado
+    musculos: { pectoral: 1, deltoides_anterior: 0.5, triceps: 0.5 }
+  cruces-polea:
+    nombre: Cruces en polea
+    tipo: aislamiento
+    brain_page: aperturas
+    musculos: { pectoral: 1 }
+  remo-t:
+    nombre: Remo en T
+    tipo: multiarticular
+    musculos: { espalda: 1, biceps: 0.5, deltoides_posterior: 0.5 }
+  remo-sentado-polea:
+    nombre: Remo sentado en polea
+    tipo: multiarticular
+    musculos: { espalda: 1, biceps: 0.5, deltoides_posterior: 0.5 }
+  jalon-pecho:
+    nombre: Jalón al pecho en polea
+    tipo: multiarticular
+    musculos: { espalda: 1, biceps: 0.5 }
+  dominadas:
+    nombre: Dominadas
+    tipo: multiarticular
+    # Con peso corporal: el peso que se anota es el agregado, el 1RM estimado no sirve
+    e1rm: false
+    musculos: { espalda: 1, biceps: 0.5 }
+  elevaciones-laterales:
+    nombre: Elevaciones laterales (mancuerna o polea)
+    tipo: aislamiento
+    brain_page: elevaciones-laterales
+    musculos: { deltoides_lateral: 1 }
+  elevaciones-laterales-polea:
+    nombre: Elevaciones laterales en polea
+    tipo: aislamiento
+    brain_page: elevaciones-laterales
+    musculos: { deltoides_lateral: 1 }
+  aperturas-invertidas-polea:
+    nombre: Aperturas invertidas en polea
+    tipo: aislamiento
+    musculos: { deltoides_posterior: 1 }
+  extension-triceps-cabeza:
+    nombre: Extensión de tríceps por encima de la cabeza
+    tipo: aislamiento
+    brain_page: extension-de-triceps-por-encima-de-la-cabeza
+    musculos: { triceps: 1 }
+  curl-mancuernas:
+    nombre: Curl con mancuernas
+    tipo: aislamiento
+    musculos: { biceps: 1 }
+  curl-barra-polea:
+    nombre: Curl con barra o en polea
+    tipo: aislamiento
+    musculos: { biceps: 1 }
+  prensa:
+    nombre: Prensa
+    tipo: multiarticular
+    brain_page: prensa
+    musculos: { cuadriceps: 1, gluteos: 0.5 }
+  sentadilla:
+    nombre: Sentadilla con barra
+    tipo: multiarticular
+    brain_page: sentadilla
+    musculos: { cuadriceps: 1, gluteos: 0.5 }
+  extension-cuadriceps:
+    nombre: Extensión de cuádriceps
+    tipo: aislamiento
+    brain_page: extension-de-cuadriceps
+    musculos: { cuadriceps: 1, recto_femoral: 1 }
+  curl-femoral-acostado:
+    nombre: Curl femoral acostado
+    tipo: aislamiento
+    brain_page: curl-femoral-acostado
+    musculos: { isquiotibiales: 1 }
+  peso-muerto-rumano:
+    nombre: Peso muerto rumano
+    tipo: multiarticular
+    musculos: { isquiotibiales: 1, gluteos: 0.5 }
+  elevacion-talones-pie:
+    nombre: Elevación de talones de pie
+    tipo: aislamiento
+    brain_page: elevacion-de-talones-de-pie
+    musculos: { pantorrillas: 1 }

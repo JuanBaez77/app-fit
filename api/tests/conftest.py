@@ -10,9 +10,12 @@ from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
+from app.cli import create_user
 from app.config import get_settings
 from app.db import get_db
 from app.main import app
+from app.models import AppUser
+from app.security import create_access_token
 
 API_DIR = Path(__file__).resolve().parent.parent
 
@@ -68,6 +71,17 @@ def db(engine: Engine) -> Iterator[Session]:
         yield session
         session.close()
         transaction.rollback()
+
+
+@pytest.fixture
+def user(db: Session) -> AppUser:
+    return create_user(db, "juan@example.com", "contraseña-de-prueba")
+
+
+@pytest.fixture
+def auth(user: AppUser) -> dict[str, str]:
+    """Header de autorización del usuario de prueba."""
+    return {"Authorization": f"Bearer {create_access_token(user.id, get_settings())}"}
 
 
 @pytest.fixture

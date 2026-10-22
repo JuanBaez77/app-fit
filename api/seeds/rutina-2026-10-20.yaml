@@ -1,0 +1,65 @@
+# Transcripción de rutinas/juan/rutina-2026-10-20.md (v1) del brain.
+# Ejercicios: claves de catalogo.yaml. Descanso en segundos.
+# rampa: series de las semanas 1 y 2 (la rutina sube el volumen de a poco).
+
+inicio: 2026-10-20
+revision: 2026-11-17
+
+dias:
+  - nombre: Torso
+    dia: 1
+    ejercicios:
+      - { ejercicio: press-banca-barra, series: 3, reps: [6, 10], rir: [1, 2], descanso: [120, 180] }
+      - { ejercicio: remo-t, series: 3, reps: [8, 12], rir: [1, 2], descanso: [120, 180] }
+      - { ejercicio: press-inclinado-mancuernas, series: 3, rampa: 2, reps: [8, 12], rir: [1, 2], descanso: [120, 180] }
+      - { ejercicio: jalon-pecho, series: 2, reps: [8, 12], rir: [1, 2], descanso: [120, 120] }
+      - { ejercicio: elevaciones-laterales, series: 3, reps: [12, 16], rir: [0, 1], descanso: [90, 120] }
+      - { ejercicio: extension-triceps-cabeza, series: 3, reps: [10, 15], rir: [0, 1], descanso: [90, 120], nota: En polea }
+      - { ejercicio: curl-mancuernas, series: 2, reps: [10, 15], rir: [0, 1], descanso: [90, 90] }
+  - nombre: Pierna A
+    dia: 2
+    ejercicios:
+      - { ejercicio: prensa, series: 3, reps: [8, 12], rir: [1, 2], descanso: [120, 180], nota: "Hasta ~100° de rodilla o más" }
+      - { ejercicio: extension-cuadriceps, series: 3, reps: [12, 20], rir: [0, 1], descanso: [90, 120], nota: Respaldo reclinado }
+      - { ejercicio: curl-femoral-acostado, series: 3, reps: [10, 15], rir: [0, 1], descanso: [90, 120] }
+      - { ejercicio: peso-muerto-rumano, series: 3, reps: [8, 12], rir: [2, 2], descanso: [120, 180] }
+      - { ejercicio: elevacion-talones-pie, series: 5, reps: [10, 15], rir: [0, 1], descanso: [90, 90] }
+  - nombre: Empuje
+    dia: 3
+    ejercicios:
+      - { ejercicio: press-inclinado-barra, series: 3, reps: [6, 10], rir: [1, 2], descanso: [120, 180] }
+      - { ejercicio: cruces-polea, series: 3, rampa: 2, reps: [12, 15], rir: [0, 1], descanso: [90, 120] }
+      - { ejercicio: elevaciones-laterales, series: 5, rampa: 4, reps: [12, 16], rir: [0, 1], descanso: [90, 120] }
+      - { ejercicio: extension-triceps-cabeza, series: 3, reps: [10, 15], rir: [0, 1], descanso: [90, 120] }
+  - nombre: Tirón
+    dia: 4
+    ejercicios:
+      - { ejercicio: dominadas, series: 3, reps: [6, 10], rir: [1, 2], descanso: [120, 180], nota: "O jalón si no salen 6 repeticiones" }
+      - { ejercicio: remo-sentado-polea, series: 2, reps: [8, 12], rir: [1, 2], descanso: [120, 120] }
+      - { ejercicio: aperturas-invertidas-polea, series: 4, reps: [12, 20], rir: [0, 1], descanso: [90, 90] }
+      - { ejercicio: elevaciones-laterales-polea, series: 4, rampa: 3, reps: [12, 16], rir: [0, 1], descanso: [90, 120] }
+      - { ejercicio: curl-barra-polea, series: 3, reps: [8, 12], rir: [0, 1], descanso: [90, 90] }
+  - nombre: Pierna B
+    dia: 5
+    ejercicios:
+      - { ejercicio: sentadilla, series: 3, reps: [6, 10], rir: [2, 2], descanso: [180, 180] }
+      - { ejercicio: extension-cuadriceps, series: 2, reps: [12, 20], rir: [0, 1], descanso: [90, 120], nota: Respaldo reclinado }
+      - { ejercicio: curl-femoral-acostado, series: 4, reps: [10, 15], rir: [0, 1], descanso: [90, 120] }
+      - { ejercicio: elevacion-talones-pie, series: 5, reps: [10, 15], rir: [0, 1], descanso: [90, 90] }
+
+# Tabla "Volumen semanal por músculo".
+# directas y rango: como los escribe la rutina (series directas).
+# fraccionales: el total con las indirectas a 0,5 (los "~" de la rutina); es contra lo que se
+# compara el volumen fraccional que calcula la app.
+musculos:
+  pectoral: { directas: 12, rango: [10, 14], fraccionales: 12, prioridad: alta }
+  deltoides_lateral: { directas: 12, rango: [10, 14], fraccionales: 12, prioridad: alta }
+  deltoides_posterior: { directas: 4, rango: [4, 6], fraccionales: 6.5, prioridad: media }
+  deltoides_anterior: { directas: 0, fraccionales: 4.5, prioridad: media }
+  espalda: { directas: 10, rango: [8, 12], fraccionales: 10, prioridad: mantenimiento }
+  triceps: { directas: 6, rango: [5, 8], fraccionales: 10.5, prioridad: mantenimiento }
+  biceps: { directas: 5, rango: [4, 6], fraccionales: 10, prioridad: mantenimiento }
+  cuadriceps: { directas: 11, rango: [10, 12], fraccionales: 11, prioridad: mantenimiento }
+  isquiotibiales: { directas: 10, rango: [8, 10], fraccionales: 10, prioridad: mantenimiento }
+  gluteos: { directas: 0, fraccionales: 4.5, prioridad: mantenimiento }
+  pantorrillas: { directas: 10, rango: [8, 10], fraccionales: 10, prioridad: mantenimiento }

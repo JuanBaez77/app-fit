@@ -1,0 +1,23 @@
+# Perfil inicial, de personas/juan.md del brain (actualizado 2026-10-20). Sin nombre ni correo:
+# es lo que se manda al brain. Se edita después en Ajustes.
+
+sexo: masculino
+# 21 años en 2026
+anio_nacimiento: 2005
+altura_cm: 174
+anios_experiencia: 4
+rir_habitual: 2
+objetivo: >-
+  Hipertrofia, con prioridad en pectoral y hombros. En la definición: conservar el músculo,
+  y ganar si se puede, mientras baja grasa.
+musculos_prioritarios: [pectoral, deltoides_lateral]
+fase: definicion
+fase_inicio: 2026-10-20
+fase_objetivo: inicios de diciembre de 2026
+equipamiento: >-
+  Gimnasio completo: poleas, máquina de gemelos de pie, extensión de cuádriceps, camilla de
+  femorales (curl acostado), prensa y remo en T. Se asume que tiene barras, mancuernas, rack,
+  bancos regulables, barra de dominadas y paralelas (falta confirmarlo). No tiene hack, péndulo,
+  máquinas guiadas de pecho y espalda, ni curl femoral sentado.
+limitaciones: null
+paso_peso_kg: 2.5
