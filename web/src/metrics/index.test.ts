@@ -8,6 +8,7 @@ import {
   lastTime,
   prefill,
   routineWeek,
+  sessionSeries,
   targetSets,
   weekStart,
 } from './index'
@@ -162,5 +163,20 @@ describe('weekStart', () => {
     expect(weekStart('2026-11-08')).toBe('2026-11-02')
     expect(weekStart('2026-11-09')).toBe('2026-11-09')
     expect(weekStart('2027-01-01')).toBe('2026-12-28')
+  })
+})
+
+describe('sessionSeries', () => {
+  test('un punto por sesión con 1RM, peso máximo y volumen', () => {
+    const history = groupBySession(
+      [set('s1', 1, 80, 8), set('s1', 2, 80, 7), set('s2', 1, 82.5, 6)],
+      SESSIONS,
+    )
+
+    const [first, second] = sessionSeries(history, true)
+
+    expect(first).toMatchObject({ sessionId: 's1', maxWeight: 80, volume: 1200 })
+    expect(first!.e1rm).toBeCloseTo(101.33, 2)
+    expect(second).toMatchObject({ sessionId: 's2', maxWeight: 82.5, volume: 495 })
   })
 })
