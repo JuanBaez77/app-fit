@@ -214,3 +214,6 @@ export function resetSyncForTests(): void {
   running = null
   state = { syncing: false, lastSyncAt: null, error: null }
 }
+
+// En desarrollo Vite recarga este módulo en caliente: los timers del módulo viejo se cortan
+import.meta.hot?.dispose(() => stopSync())

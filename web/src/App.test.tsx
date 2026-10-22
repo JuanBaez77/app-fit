@@ -77,3 +77,19 @@ test('sin red y sin usuario conocido pide login', async () => {
 
   expect(await screen.findByRole('button', { name: 'Entrar' })).toBeInTheDocument()
 })
+
+test('con un usuario conocido abre al instante, y si la sesión venció pide login', async () => {
+  localStorage.setItem('appfit.user', JSON.stringify(USER))
+  let answer: (response: Response) => void = () => {}
+  mockFetch({
+    'POST /api/auth/refresh': () => new Promise<Response>((resolve) => (answer = resolve)),
+  })
+  renderApp()
+
+  // Antes de que responda el servidor ya está en Hoy
+  expect(await screen.findByRole('heading', { name: 'Hoy' })).toBeInTheDocument()
+
+  answer(json({ detail: 'Sesión vencida' }, 401))
+  expect(await screen.findByRole('button', { name: 'Entrar' })).toBeInTheDocument()
+  expect(localStorage.getItem('appfit.user')).toBeNull()
+})
