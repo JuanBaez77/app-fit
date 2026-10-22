@@ -1,0 +1,50 @@
+# Entorno de desarrollo. Producción llega en PR-05 (docker-compose.prod.yml).
+name: app-fit
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-appfit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-appfit}
+      POSTGRES_DB: ${POSTGRES_DB:-appfit}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+      target: dev
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-appfit}:${POSTGRES_PASSWORD:-appfit}@db:5432/${POSTGRES_DB:-appfit}
+      # En Windows los cambios de archivos montados no llegan como eventos: la recarga sondea
+      WATCHFILES_FORCE_POLLING: "true"
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./api:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Sirve el build de web/ (make web-build) como en producción, para probar la PWA instalada.
+  # Para el día a día, make web levanta Vite con recarga en caliente.
+  nginx:
+    image: nginx:1.28-alpine
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+    volumes:
+      - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+
+volumes:
+  db-data:

@@ -1,0 +1,45 @@
+#!/bin/sh
+# Antes de pushear corre scripts/check.sh para las partes que cambian (api/, web/),
+# igual que los filtros por carpeta de los workflows.
+# Se activa una vez por clon: git config core.hooksPath .githooks
+# Para saltearlo en una emergencia: git push --no-verify
+set -eu
+
+zero=0000000000000000000000000000000000000000
+changed=""
+
+# Git pasa una línea por rama: <ref local> <sha local> <ref remota> <sha remota>
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # Borrar una rama remota no necesita checks
+  [ "$local_sha" = "$zero" ] && continue
+
+  base=""
+  if [ "$remote_sha" != "$zero" ] && git cat-file -e "$remote_sha" 2>/dev/null; then
+    base=$remote_sha
+  else
+    # Rama nueva (o la remota tiene commits que no bajaste): comparar contra main
+    base=$(git merge-base "$local_sha" origin/main 2>/dev/null || true)
+  fi
+
+  if [ -n "$base" ]; then
+    changed="$changed
+$(git diff --name-only "$base" "$local_sha")"
+  else
+    # Sin base para comparar: chequear todo
+    changed="$changed
+api/
+web/"
+  fi
+done
+
+parts=""
+if echo "$changed" | grep -q '^api/'; then parts="$parts api"; fi
+if echo "$changed" | grep -q '^web/'; then parts="$parts web"; fi
+
+if [ -z "$parts" ]; then
+  echo "pre-push: no hay cambios en api/ ni web/, sin checks."
+  exit 0
+fi
+
+echo "pre-push: checks de$parts"
+exec sh scripts/check.sh $parts
