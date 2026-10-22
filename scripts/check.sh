@@ -1,12 +1,12 @@
 #!/bin/sh
 # Corre en local lo mismo que los workflows de .github/workflows/.
-# Uso: sh scripts/check.sh [api] [web]   (sin argumentos, las dos partes)
+# Uso: sh scripts/check.sh [api] [web] [brain]   (sin argumentos, todas)
 # Revisa el árbol de trabajo, no solo lo commiteado.
 set -eu
 
 cd "$(dirname "$0")/.."
 
-parts="${*:-api web}"
+parts="${*:-api web brain}"
 
 for part in $parts; do
   case "$part" in
@@ -34,8 +34,18 @@ for part in $parts; do
         npm run -s build
       )
       ;;
+    brain)
+      echo "==> brain: ruff (en Docker) y tests del bundle (Python local: necesitan git)"
+      # En Git Bash, pwd -W da la ruta de Windows que entiende Docker
+      root=$(pwd -W 2>/dev/null || pwd)
+      MSYS_NO_PATHCONV=1 docker compose run --rm --no-deps -v "$root/brain:/brain" api \
+        sh -c "ruff check --config /app/pyproject.toml /brain \
+               && ruff format --check --config /app/pyproject.toml /brain"
+      python=$(command -v py || command -v python3)
+      "$python" -m unittest discover -s brain/tests
+      ;;
     *)
-      echo "Parte desconocida: $part (usá api o web)" >&2
+      echo "Parte desconocida: $part (usá api, web o brain)" >&2
       exit 2
       ;;
   esac

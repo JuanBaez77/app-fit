@@ -2,7 +2,33 @@
 
 Herramientas que corren en tu PC contra el vault `C:\second-brain`. No se despliegan.
 
-- `build_bundle.py` (PR-09): arma el bundle del brain y la lista de páginas citables.
-- `cases/` (PR-17): los 6 casos de prueba del prompt y sus resultados.
+## Bundle
 
-La salida generada va a `brain/out/`, que no se versiona.
+```bash
+py brain/build_bundle.py               # usa BRAIN_VAULT o C:\second-brain
+py brain/build_bundle.py D:\otro-vault --out brain/out
+```
+
+Arma el texto que la API le pasa a Claude como contexto:
+
+- **Qué va:**
+  - las reglas de `CLAUDE.md` que le sirven a un modelo sin acceso a archivos: §5 (jerarquía de evidencia), §6.7 (ajuste) y §10 (reglas inquebrantables);
+  - `index.md`;
+  - las páginas de `wiki/{conceptos,musculos,ejercicios,splits,claims}`.
+- **Qué no va:**
+  - `wiki/estudios/` va solo por nombre, en la lista de páginas citables;
+  - `personas/` y `rutinas/` no van, porque el perfil y la rutina los manda la app.
+- **De dónde lee:** del último commit, con `git`, no recorriendo carpetas. El vault tiene copias de la wiki en `.claude/worktrees/` que duplicarían páginas. Si hay cambios sin commitear en `wiki/`, `index.md` o `CLAUDE.md`, falla (`--allow-dirty` para seguir igual).
+- **Qué deja en `brain/out/`** (no se versiona):
+  - `bundle-<commit>.xml`;
+  - `pages-<commit>.json`, las páginas citables, contra las que se validan las citas del brain;
+  - `latest.json`, el manifiesto.
+- **Esquema:** avisa si la versión del esquema de `CLAUDE.md` deja de ser la 6, para que revises el prompt.
+
+Tokens: muestra una estimación por bytes. El número real lo da la API a partir de PR-17.
+
+Tests: `py -m unittest discover -s brain/tests` (los corre el hook pre-push).
+
+## Próximamente
+
+- `cases/` (PR-17): los 6 casos de prueba del prompt y sus resultados.
