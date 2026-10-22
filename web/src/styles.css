@@ -298,15 +298,27 @@ button.big {
   gap: 6px;
 }
 
-.sets li {
+.set-row {
   display: grid;
   grid-template-columns: 2.5em 1fr auto 1.5em;
   align-items: center;
-  min-height: 40px;
+  gap: 8px;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 0 8px;
+  text-align: left;
   font-variant-numeric: tabular-nums;
 }
 
-.sets li.next {
+button.set-row {
+  background: var(--bg);
+}
+
+button.set-row[aria-pressed='true'] {
+  border-color: var(--accent);
+}
+
+.sets li.next .set-row {
   font-weight: 700;
 }
 
@@ -348,4 +360,115 @@ button.big {
 
 .last-set + .last-set {
   margin-left: 0.9em;
+}
+
+/* Panel de registro: fijo abajo, donde llega el pulgar */
+.session {
+  padding-bottom: 0;
+}
+
+.set-panel {
+  position: sticky;
+  bottom: 0;
+  margin: 16px -16px 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--bg);
+  border-top: 2px solid var(--border);
+  display: grid;
+  gap: 8px;
+}
+
+.set-panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: 4.5em 56px 1fr 56px;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepper-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.stepper > button,
+.stepper > input {
+  min-height: 56px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  user-select: none;
+}
+
+.stepper-value {
+  background: var(--bg);
+}
+
+.rir-hint {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.rir-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.rir-chip {
+  min-height: 64px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.set-panel-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+button.danger {
+  color: var(--danger);
+}
+
+.toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  background: var(--text);
+  color: var(--bg);
+  z-index: 10;
+}
+
+.toast .link {
+  color: var(--bg);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.picker {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.picker button {
+  text-align: left;
 }

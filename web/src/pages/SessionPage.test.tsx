@@ -93,7 +93,9 @@ test('se puede pasar a otro ejercicio; sin historial dice Primera vez', async ()
 
   const card = await screen.findByRole('region', { name: 'Remo en T' })
   expect(within(card).getByText('Primera vez')).toBeInTheDocument()
-  expect(within(card).getByText('Sin historial')).toBeInTheDocument()
+  // Sin historial arranca en 0 kg con el mínimo de repeticiones de la rutina
+  expect(screen.getByRole('button', { name: /Peso: 0 kg/ })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Reps: 6/ })).toBeInTheDocument()
 })
 
 test('en la semana 1 usa las series de la rampa', async () => {
@@ -118,4 +120,129 @@ test('sesión inexistente', async () => {
   renderSession('no-existe')
 
   expect(await screen.findByText('No encontré esa sesión.')).toBeInTheDocument()
+})
+
+async function todaySets() {
+  return (await db.set_logs.where('session_id').equals('hoy').toArray())
+    .filter((s) => !s.deleted_at)
+    .sort((a, b) => a.set_number - b.set_number)
+}
+
+test('una serie sin cambios se guarda con un toque en la ficha de RIR', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'RIR 2: guardar' }))
+
+  const [saved] = await todaySets()
+  expect(saved).toMatchObject({
+    set_number: 1,
+    weight_kg: 80,
+    reps: 8,
+    rir: 2,
+    routine_day_exercise_id: 'rde-banca',
+  })
+  expect(await screen.findByRole('region', { name: 'Serie 2' })).toBeInTheDocument()
+  expect(await db.outbox.get(`set_logs:${saved!.id}`)).toBeDefined()
+})
+
+test('con un ajuste son dos toques; el RIR 3+ se guarda como 3', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Más peso' }))
+  await userEvent.click(screen.getByRole('button', { name: 'RIR 3+: guardar' }))
+
+  expect(await todaySets()).toMatchObject([{ weight_kg: 82.5, reps: 8, rir: 3 }])
+})
+
+test('guardar sin RIR y bajar repeticiones', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Menos reps' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Guardar sin RIR' }))
+
+  expect(await todaySets()).toMatchObject([{ weight_kg: 80, reps: 7, rir: null }])
+})
+
+test('tocar el número abre el teclado numérico y acepta coma', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: /Peso: 80 kg/ }))
+  const input = screen.getByRole('textbox', { name: 'Peso' })
+  expect(input).toHaveAttribute('inputmode', 'decimal')
+  await userEvent.clear(input)
+  await userEvent.type(input, '82,5{Enter}')
+  await userEvent.click(screen.getByRole('button', { name: 'RIR 1: guardar' }))
+
+  expect(await todaySets()).toMatchObject([{ weight_kg: 82.5, rir: 1 }])
+})
+
+test('el paso de peso sale del perfil', async () => {
+  await seed()
+  await db.profile.put({ key: 'me', weight_step_kg: 1.25 } as never)
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Más peso' }))
+  await userEvent.click(screen.getByRole('button', { name: 'RIR 2: guardar' }))
+
+  expect((await todaySets())[0]?.weight_kg).toBe(81.25)
+})
+
+test('con la última serie de la rutina pasa solo al ejercicio siguiente', async () => {
+  await seed()
+  renderSession()
+
+  for (let i = 0; i < 3; i++) {
+    await userEvent.click(await screen.findByRole('button', { name: 'RIR 2: guardar' }))
+    await screen.findByRole('region', { name: i < 2 ? `Serie ${i + 2}` : 'Serie 1' })
+  }
+
+  expect(await screen.findByRole('region', { name: 'Remo en T' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Press de banca con barra/ })).toHaveTextContent('✓')
+})
+
+test('una serie guardada se edita tocándola', async () => {
+  await seed()
+  renderSession()
+  await userEvent.click(await screen.findByRole('button', { name: 'RIR 2: guardar' }))
+
+  await userEvent.click(await screen.findByRole('button', { name: /Serie 1: 80 kg × 8/ }))
+  expect(screen.getByRole('region', { name: 'Editando serie 1' })).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Más reps' }))
+  await userEvent.click(screen.getByRole('button', { name: 'RIR 1: guardar' }))
+
+  expect(await todaySets()).toMatchObject([{ set_number: 1, reps: 9, rir: 1 }])
+})
+
+test('borrar una serie se puede deshacer', async () => {
+  await seed()
+  renderSession()
+  await userEvent.click(await screen.findByRole('button', { name: 'RIR 2: guardar' }))
+
+  await userEvent.click(await screen.findByRole('button', { name: /Serie 1: 80 kg/ }))
+  await userEvent.click(screen.getByRole('button', { name: 'Borrar serie' }))
+  expect(await screen.findByText('Serie 1 borrada')).toBeInTheDocument()
+  expect(await todaySets()).toHaveLength(0)
+
+  await userEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
+  await screen.findByRole('button', { name: /Serie 1: 80 kg/ })
+  expect(await todaySets()).toHaveLength(1)
+})
+
+test('un ejercicio fuera de rutina se agrega desde el catálogo', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: '+ ejercicio' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Prensa' }))
+  const card = await screen.findByRole('region', { name: 'Prensa' })
+  expect(within(card).getByText('Fuera de rutina')).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'RIR 1: guardar' }))
+
+  expect(await todaySets()).toMatchObject([
+    { exercise_id: 'ex-prensa', routine_day_exercise_id: null },
+  ])
 })
