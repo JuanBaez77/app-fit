@@ -4,7 +4,7 @@ API := $(COMPOSE) run --rm --no-deps api
 API_DB := $(COMPOSE) run --rm api
 
 .DEFAULT_GOAL := help
-.PHONY: help up down logs ps migrate web web-build \
+.PHONY: help up down logs ps migrate dev-user web web-build \
         check lint lint-api lint-web test test-api test-web fmt fmt-api fmt-web
 
 help: ## Lista los comandos
@@ -21,6 +21,10 @@ logs: ## Sigue los logs de todos los servicios
 
 ps: ## Estado de los servicios
 	$(COMPOSE) ps
+
+dev-user: ## Crea el usuario de desarrollo de .env.example en la base local
+	$(COMPOSE) exec -e APPFIT_PASSWORD=$${DEV_USER_PASSWORD:-contrasena-dev-123} api \
+		python -m app.cli create-user $${DEV_USER_EMAIL:-dev@example.com}
 
 migrate: ## Aplica las migraciones (la api también las aplica al arrancar)
 	$(API_DB) alembic upgrade head

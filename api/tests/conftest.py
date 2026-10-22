@@ -1,3 +1,4 @@
+import os
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -14,6 +15,11 @@ from app.db import get_db
 from app.main import app
 
 API_DIR = Path(__file__).resolve().parent.parent
+
+# Los tests usan la configuración de producción, no la del compose de dev.
+# No hay nginx adelante que agregue /api.
+os.environ["COOKIE_PATH"] = "/auth"
+os.environ["COOKIE_SECURE"] = "true"
 
 
 def _test_url() -> str:
@@ -65,6 +71,7 @@ def db(engine: Engine) -> Iterator[Session]:
 @pytest.fixture
 def client(db: Session) -> Iterator[TestClient]:
     app.dependency_overrides[get_db] = lambda: db
-    with TestClient(app) as test_client:
+    # https para que viaje la cookie Secure del refresh
+    with TestClient(app, base_url="https://testserver") as test_client:
         yield test_client
     app.dependency_overrides.clear()
