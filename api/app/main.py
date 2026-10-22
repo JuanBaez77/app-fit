@@ -4,11 +4,12 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.deps import DbSession
-from app.routers import auth, me
+from app.routers import auth, me, routines
 
 app = FastAPI(title="app-fit API")
 app.include_router(auth.router)
 app.include_router(me.router)
+app.include_router(routines.router)
 
 
 @app.get("/health")

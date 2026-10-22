@@ -108,7 +108,11 @@ class RoutineMuscleTarget(Base):
 
     routine_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("routine.id"), primary_key=True)
     muscle_id: Mapped[str] = mapped_column(ForeignKey("muscle.id"), primary_key=True)
+    # Series directas objetivo y su rango, como los escribe la rutina
     target_sets: Mapped[Decimal] = mapped_column(Numeric(4, 1))
+    # El mismo objetivo contando las indirectas a 0,5: contra esto se compara el volumen
+    # fraccional (tríceps: 6 directas, ~10,5 fraccionales)
+    fractional_target: Mapped[Decimal | None] = mapped_column(Numeric(4, 1))
     range_min: Mapped[Decimal | None] = mapped_column(Numeric(4, 1))
     range_max: Mapped[Decimal | None] = mapped_column(Numeric(4, 1))
     priority: Mapped[str | None] = mapped_column(Text)
