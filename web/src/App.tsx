@@ -1,8 +1,28 @@
-// PR-04 reemplaza esto por el shell de la PWA (router, barra inferior y login).
+import { Navigate, Route, Routes } from 'react-router'
+import { useAuth } from './auth/context'
+import Layout from './components/Layout'
+import HoyPage from './pages/HoyPage'
+import LoginPage from './pages/LoginPage'
+import Placeholder from './pages/Placeholder'
+
 export default function App() {
+  const { state } = useAuth()
+
+  if (state.status === 'checking') {
+    return <main className="splash" aria-busy="true" />
+  }
+  if (state.status === 'anonymous') {
+    return <LoginPage />
+  }
   return (
-    <main>
-      <h1>app-fit</h1>
-    </main>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<HoyPage />} />
+        <Route path="calendario" element={<Placeholder title="Calendario" comingIn="PR-19" />} />
+        <Route path="progreso" element={<Placeholder title="Progreso" comingIn="PR-20" />} />
+        <Route path="analisis" element={<Placeholder title="Análisis" comingIn="PR-27" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
   )
 }
