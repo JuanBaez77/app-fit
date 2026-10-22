@@ -1,9 +1,20 @@
-from fastapi import FastAPI
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+from app.db import get_db
 
 app = FastAPI(title="app-fit API")
 
 
-# PR-02 suma el chequeo de la base de datos.
 @app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+def health(db: Annotated[Session, Depends(get_db)]) -> JSONResponse:
+    try:
+        db.execute(text("SELECT 1"))
+    except SQLAlchemyError:
+        return JSONResponse({"status": "error", "db": "error"}, status_code=503)
+    return JSONResponse({"status": "ok", "db": "ok"})

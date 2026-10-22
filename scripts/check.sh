@@ -18,7 +18,8 @@ for part in $parts; do
       fi
       # Reconstruye la imagen si cambió uv.lock; si no, usa la caché
       docker compose build --quiet api
-      docker compose run --rm --no-deps api \
+      # Con dependencias: los tests usan Postgres (base <nombre>_test, se recrea en cada corrida)
+      docker compose run --rm api \
         sh -c "ruff check . && ruff format --check . && mypy . && pytest -q"
       ;;
     web)
