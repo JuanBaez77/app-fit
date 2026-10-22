@@ -135,6 +135,7 @@ test('una serie sin cambios se guarda con un toque en la ficha de RIR', async ()
   await userEvent.click(await screen.findByRole('button', { name: 'RIR 2: guardar' }))
 
   const [saved] = await todaySets()
+  expect(saved!.interaction_ms).toEqual(expect.any(Number))
   expect(saved).toMatchObject({
     set_number: 1,
     weight_kg: 80,
