@@ -22,8 +22,12 @@ services:
     build:
       context: ./api
       target: dev
+    # Aplica las migraciones al arrancar
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --root-path /api"
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-appfit}:${POSTGRES_PASSWORD:-appfit}@db:5432/${POSTGRES_DB:-appfit}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-appfit}:${POSTGRES_PASSWORD:-appfit}@db:5432/${POSTGRES_DB:-appfit}
       # En Windows los cambios de archivos montados no llegan como eventos: la recarga sondea
       WATCHFILES_FORCE_POLLING: "true"
     ports:

@@ -1,6 +1,7 @@
 # La API corre sus herramientas dentro del contenedor (Python 3.12); la web, con el Node local.
 COMPOSE := docker compose
 API := $(COMPOSE) run --rm --no-deps api
+API_DB := $(COMPOSE) run --rm api
 
 .DEFAULT_GOAL := help
 .PHONY: help up down logs ps migrate web web-build \
@@ -21,8 +22,8 @@ logs: ## Sigue los logs de todos los servicios
 ps: ## Estado de los servicios
 	$(COMPOSE) ps
 
-migrate: ## Aplica las migraciones (llega con Alembic en PR-02)
-	@echo "Todavía no hay migraciones: llegan en PR-02."
+migrate: ## Aplica las migraciones (la api también las aplica al arrancar)
+	$(API_DB) alembic upgrade head
 
 web: ## Vite con recarga en caliente en http://localhost:5173
 	cd web && npm run dev
@@ -44,7 +45,7 @@ lint-web:
 test: test-api test-web ## Tests de api y web
 
 test-api:
-	$(API) pytest
+	$(API_DB) pytest
 
 test-web:
 	cd web && npm test

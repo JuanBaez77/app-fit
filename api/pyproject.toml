@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "API de app-fit: registro de entrenamiento y análisis con el brain"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "alembic>=1.20.1",
     "fastapi>=0.159.1",
+    "psycopg[binary]>=3.3.6",
+    "pydantic-settings>=2.16.1",
+    "sqlalchemy>=2.1.6",
     "uvicorn[standard]>=0.54.0",
 ]
 
