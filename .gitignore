@@ -30,3 +30,6 @@ Thumbs.db
 # Claude Code
 .claude/worktrees/
 .claude/settings.local.json
+
+# Copias de pg_dump en el servidor
+backups/

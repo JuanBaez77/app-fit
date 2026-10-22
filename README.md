@@ -4,6 +4,7 @@ PWA mobile-first y offline-first para registrar el entrenamiento en el gimnasio,
 
 - Diseño: [docs/diseno-resumen.md](docs/diseno-resumen.md) y [docs/diseno-completo.md](docs/diseno-completo.md)
 - Plan de sprints y PRs: [docs/sprints.md](docs/sprints.md)
+- Deploy en el VPS: [docs/deploy.md](docs/deploy.md)
 
 ## Estructura
 

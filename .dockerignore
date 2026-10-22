@@ -1,0 +1,11 @@
+# Contexto de la imagen web (nginx/Dockerfile): solo hace falta web/ y nginx/
+**/node_modules
+**/dist
+**/coverage
+.git
+api
+brain
+backups
+docs
+.env
+.env.*

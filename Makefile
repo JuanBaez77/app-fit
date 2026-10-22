@@ -4,7 +4,7 @@ API := $(COMPOSE) run --rm --no-deps api
 API_DB := $(COMPOSE) run --rm api
 
 .DEFAULT_GOAL := help
-.PHONY: help up down logs ps migrate dev-user web web-build \
+.PHONY: help up down logs ps migrate dev-user deploy web web-build \
         check lint lint-api lint-web test test-api test-web fmt fmt-api fmt-web
 
 help: ## Lista los comandos
@@ -28,6 +28,9 @@ dev-user: ## Crea el usuario de desarrollo de .env.example en la base local
 
 migrate: ## Aplica las migraciones (la api también las aplica al arrancar)
 	$(API_DB) alembic upgrade head
+
+deploy: ## Despliega main en el VPS: make deploy HOST=sv-gcg (ver docs/deploy.md)
+	sh scripts/deploy.sh $(HOST)
 
 web: ## Vite con recarga en caliente en http://localhost:5173
 	cd web && npm run dev
