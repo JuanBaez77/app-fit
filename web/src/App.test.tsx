@@ -68,7 +68,7 @@ test('sin red entra con el último usuario conocido', async () => {
   renderApp()
 
   expect(await screen.findByRole('heading', { name: 'Hoy' })).toBeInTheDocument()
-  expect(screen.getByText(/Sin conexión/)).toBeInTheDocument()
+  expect(await screen.findByText(/Sin conexión/)).toBeInTheDocument()
 })
 
 test('sin red y sin usuario conocido pide login', async () => {

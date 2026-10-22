@@ -17,7 +17,8 @@ export function json(body: unknown, status = 200): Response {
 export function mockFetch(routes: Record<string, Handler>) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const key = `${init?.method ?? 'GET'} ${String(input)}`
-    const handler = routes[key]
+    // Si no hay una ruta exacta, prueba sin la query string
+    const handler = routes[key] ?? routes[key.split('?')[0]!]
     if (!handler) throw new Error(`fetch sin simular: ${key}`)
     return handler(init)
   })

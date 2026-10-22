@@ -2,7 +2,7 @@ import { useAuth } from '../auth/context'
 
 // PR-11 trae la sesión del día y el botón Empezar.
 export default function HoyPage() {
-  const { state, signOut } = useAuth()
+  const { signOut } = useAuth()
 
   return (
     <main>
@@ -12,9 +12,6 @@ export default function HoyPage() {
           Salir
         </button>
       </header>
-      {state.status === 'authenticated' && state.offline && (
-        <p className="notice">Sin conexión: estás usando la app con el último usuario.</p>
-      )}
     </main>
   )
 }
