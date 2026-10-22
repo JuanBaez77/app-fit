@@ -1,15 +1,20 @@
 import type { Exercise, RoutineDayExercise, SetLog } from '../db/types'
 import { decimal, kg, prescription, setText } from '../lib/format'
-import { bestMark, compareSets, lastTime, prefill, type SessionSets } from '../metrics'
+import { bestMark, compareSets, type SessionSets } from '../metrics'
 import TrendMark from './TrendMark'
 
 interface Props {
-  item: RoutineDayExercise
+  /** null = ejercicio agregado fuera de rutina */
+  item: RoutineDayExercise | null
   exercise: Exercise
-  sessionId: string
-  /** Series objetivo de esta semana (con la rampa aplicada) */
-  plannedSets: number
+  /** Series objetivo de esta semana (con la rampa aplicada); null fuera de rutina */
+  plannedSets: number | null
   history: SessionSets[]
+  today: SetLog[]
+  last: SessionSets | null
+  next: { setNumber: number; weight_kg: number; reps: number } | null
+  editingSetId: string | null
+  onSelectSet: (set: SetLog) => void
   position: number
   total: number
 }
@@ -18,18 +23,18 @@ interface Props {
 export default function ExerciseCard({
   item,
   exercise,
-  sessionId,
   plannedSets,
   history,
+  today,
+  last,
+  next,
+  editingSetId,
+  onSelectSet,
   position,
   total,
 }: Props) {
-  const today: SetLog[] = history.find((g) => g.session.id === sessionId)?.sets ?? []
-  const last = lastTime(history, sessionId)
   const best = bestMark(history, exercise.e1rm_eligible)
-  const nextNumber = today.length + 1
-  const next = prefill(nextNumber, last)
-  const titleId = `ex-${item.id}`
+  const titleId = `ex-${exercise.id}`
 
   return (
     <section className="exercise-card" aria-labelledby={titleId}>
@@ -39,8 +44,10 @@ export default function ExerciseCard({
           {position} / {total}
         </span>
       </header>
-      <p className="prescription">{prescription(item, plannedSets)}</p>
-      {item.note && <p className="muted">{item.note}</p>}
+      <p className="prescription">
+        {item && plannedSets ? prescription(item, plannedSets) : 'Fuera de rutina'}
+      </p>
+      {item?.note && <p className="muted">{item.note}</p>}
 
       <dl className="history">
         <dt>Última vez</dt>
@@ -68,22 +75,43 @@ export default function ExerciseCard({
           const previous = last?.sets.find((s) => s.set_number === set.set_number)
           return (
             <li key={set.id}>
-              <span className="set-number">{set.set_number}</span>
-              <span>
-                {kg(set.weight_kg)} kg × {set.reps}
-              </span>
-              <span className="muted">{set.rir === null ? 'sin RIR' : `RIR ${set.rir}`}</span>
-              {previous && <TrendMark trend={compareSets(set, previous, exercise.e1rm_eligible)} />}
+              <button
+                type="button"
+                className="set-row"
+                aria-pressed={set.id === editingSetId}
+                aria-label={`Serie ${set.set_number}: ${kg(set.weight_kg)} kg × ${set.reps}, ${set.rir === null ? 'sin RIR' : `RIR ${set.rir}`}. Tocá para editar`}
+                onClick={() => onSelectSet(set)}
+              >
+                <span className="set-number">{set.set_number}</span>
+                <span>
+                  {kg(set.weight_kg)} kg × {set.reps}
+                </span>
+                <span className="muted">{set.rir === null ? 'sin RIR' : `RIR ${set.rir}`}</span>
+                {previous ? (
+                  <TrendMark trend={compareSets(set, previous, exercise.e1rm_eligible)} />
+                ) : (
+                  <span />
+                )}
+              </button>
             </li>
           )
         })}
-        <li className="next" aria-current="step">
-          <span className="set-number">▶{nextNumber}</span>
-          <span>{next ? `${kg(next.weight_kg)} kg × ${next.reps}` : 'Sin historial'}</span>
-          <span className="muted">· · ·</span>
-        </li>
+        {next && (
+          <li className="next" aria-current="step">
+            <span className="set-row">
+              <span className="set-number">▶{next.setNumber}</span>
+              <span>
+                {kg(next.weight_kg)} kg × {next.reps}
+              </span>
+              <span className="muted">· · ·</span>
+              <span />
+            </span>
+          </li>
+        )}
       </ol>
-      {today.length >= plannedSets && <p className="notice">Series de la rutina completas.</p>}
+      {plannedSets !== null && today.length >= plannedSets && (
+        <p className="notice">Series de la rutina completas. Podés sumar una serie extra.</p>
+      )}
     </section>
   )
 }
