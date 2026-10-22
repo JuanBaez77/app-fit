@@ -33,3 +33,6 @@ Thumbs.db
 
 # Copias de pg_dump en el servidor
 backups/
+
+# Corridas del prompt del brain (las resume brain/cases/RESULTADOS.md)
+brain/cases/resultados/
