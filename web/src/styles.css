@@ -1,0 +1,193 @@
+/* Base visual: contraste alto (pantalla a pleno sol) y áreas táctiles de 48 px o más. */
+:root {
+  --bg: #ffffff;
+  --surface: #f1f3f6;
+  --text: #0b0d10;
+  --muted: #4a525e;
+  --border: #c9ced6;
+  --accent: #0a4fd9;
+  --accent-text: #ffffff;
+  --danger: #b3261e;
+  --ok: #0f7b3a;
+  --touch: 48px;
+  --radius: 12px;
+  --tabbar-height: 64px;
+
+  color-scheme: light dark;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d0f12;
+    --surface: #1a1e24;
+    --text: #f5f7fa;
+    --muted: #b4bcc8;
+    --border: #3a414c;
+    --accent: #5b9dff;
+    --accent-text: #0b0d10;
+    --danger: #ff8a80;
+    --ok: #6ee39a;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  min-height: var(--touch);
+  min-width: var(--touch);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0 16px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:disabled {
+  opacity: 0.6;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+button.link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  padding: 0 8px;
+}
+
+input {
+  min-height: var(--touch);
+  width: 100%;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.notice {
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  padding: 12px;
+  border-radius: 4px;
+}
+
+/* Layout con barra inferior fija */
+.layout {
+  min-height: 100dvh;
+}
+
+.content {
+  padding: 16px 16px calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 16px);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tabbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  min-height: var(--tabbar-height);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.tabbar a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tabbar-height);
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.tabbar a.active {
+  color: var(--accent);
+  font-weight: 700;
+  box-shadow: inset 0 3px 0 var(--accent);
+}
+
+/* Login */
+.login {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 48px 16px;
+}
+
+.login form {
+  display: grid;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.login label {
+  display: grid;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.splash {
+  min-height: 100dvh;
+}
