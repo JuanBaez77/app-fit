@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { SetValues } from '../data/sets'
 import { kg } from '../lib/format'
 import Stepper from './Stepper'
@@ -11,11 +11,18 @@ const RIR_CHIPS = [
   { label: '3+', value: 3 },
 ]
 
+/** Milisegundos desde start; 0 si no hubo un toque antes. */
+function msSince(start: number | null): number {
+  const now = performance.now()
+  return Math.round(now - (start ?? now))
+}
+
 interface Props {
   title: string
   initial: { weight_kg: number; reps: number }
   weightStep: number
-  onSave: (values: SetValues) => Promise<unknown>
+  /** interactionMs: del primer toque sobre el panel al toque que guarda (la meta es 5 s) */
+  onSave: (values: SetValues, interactionMs: number) => Promise<unknown>
   onDelete?: () => void
   onCancel?: () => void
 }
@@ -35,19 +42,27 @@ export default function SetPanel({
   const [weight, setWeight] = useState(initial.weight_kg)
   const [reps, setReps] = useState(initial.reps)
   const [saving, setSaving] = useState(false)
+  const firstTouch = useRef<number | null>(null)
 
   async function save(rir: number | null) {
     if (saving) return
     setSaving(true)
+    const interactionMs = msSince(firstTouch.current)
     try {
-      await onSave({ weight_kg: weight, reps, rir })
+      await onSave({ weight_kg: weight, reps, rir }, interactionMs)
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <section className="set-panel" aria-label={title}>
+    <section
+      className="set-panel"
+      aria-label={title}
+      onPointerDownCapture={() => {
+        firstTouch.current ??= performance.now()
+      }}
+    >
       <div className="set-panel-title">
         <strong>{title}</strong>
         {onCancel && (

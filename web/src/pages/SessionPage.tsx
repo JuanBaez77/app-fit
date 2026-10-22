@@ -201,13 +201,13 @@ function CurrentExercise({
       reps: entry.item?.reps_min ?? 8,
     }
 
-  async function saveNew(values: SetValues) {
+  async function saveNew(values: SetValues, interactionMs: number) {
     await logSet({
       sessionId,
       exerciseId: exercise.id,
       routineDayExerciseId: entry.item?.id ?? null,
       setNumber: nextNumber,
-      interactionMs: null,
+      interactionMs,
       ...values,
     })
     // Con la última serie de la rutina, pasa solo al ejercicio siguiente
