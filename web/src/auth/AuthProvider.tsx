@@ -31,7 +31,14 @@ function cacheUser(user: User | null): void {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({ status: 'checking' })
+  // Con un usuario conocido la app abre al instante (la meta es abrir la sesión del día en menos
+  // de 1,5 s) y la sesión se verifica en segundo plano
+  const [state, setState] = useState<AuthState>(() => {
+    const cached = readCachedUser()
+    return cached
+      ? { status: 'authenticated', user: cached, offline: true }
+      : { status: 'checking' }
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -54,12 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cacheUser(user)
         update({ status: 'authenticated', user, offline: false })
       } catch (error) {
+        // Sin red se sigue con el último usuario; el resto de los errores piden login
         const cached = readCachedUser()
-        update(
-          error instanceof NetworkError && cached
-            ? { status: 'authenticated', user: cached, offline: true }
-            : { status: 'anonymous' },
-        )
+        if (!(error instanceof NetworkError && cached)) update({ status: 'anonymous' })
       }
     })()
 

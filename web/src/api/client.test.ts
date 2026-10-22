@@ -88,3 +88,31 @@ describe('request', () => {
     await expect(login('a@b.c', 'mal')).rejects.toThrow('Correo o contraseña incorrectos')
   })
 })
+
+describe('timeout', () => {
+  test('un pedido colgado pasa a ser falta de red', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_input: RequestInfo | URL, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () =>
+              reject(new DOMException('', 'AbortError')),
+            )
+          }),
+      ),
+    )
+
+    await expect(request('/me', { signal: AbortSignal.timeout(20) })).rejects.toBeInstanceOf(
+      NetworkError,
+    )
+  })
+
+  test('sin signal propio, cada pedido lleva el tope por defecto', async () => {
+    const fetchMock = mockFetch({ 'GET /api/me': () => json({}) })
+
+    await request('/me')
+
+    expect(fetchMock.mock.calls[0]![1]?.signal).toBeInstanceOf(AbortSignal)
+  })
+})

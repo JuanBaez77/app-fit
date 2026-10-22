@@ -31,12 +31,19 @@ export function clearSession(): void {
   accessToken = null
 }
 
+/**
+ * Tope de espera por pedido. Con señal débil (o un servidor que acepta la conexión y no
+ * responde) un pedido puede quedar colgado: pasado el tope se trata como falta de red.
+ */
+export const REQUEST_TIMEOUT_MS = 10_000
+
 async function send(path: string, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers)
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  const signal = init.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS)
   try {
-    return await fetch(BASE + path, { ...init, headers, credentials: 'same-origin' })
+    return await fetch(BASE + path, { ...init, headers, signal, credentials: 'same-origin' })
   } catch {
     throw new NetworkError('Sin conexión con el servidor')
   }

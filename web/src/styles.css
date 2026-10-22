@@ -491,3 +491,95 @@ button.danger {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+
+/* Calendario */
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: capitalize;
+}
+
+.calendar {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.calendar th {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding-bottom: 4px;
+}
+
+.calendar td {
+  padding: 2px;
+  text-align: center;
+}
+
+.calendar .day {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--touch);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+  background: var(--bg);
+  line-height: 1.1;
+}
+
+.calendar .day.today {
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.calendar .day[aria-pressed='true'] {
+  background: var(--surface);
+  border-width: 2px;
+}
+
+.calendar .mark {
+  font-size: 0.75rem;
+  color: var(--accent);
+  min-height: 1em;
+}
+
+.legend {
+  font-size: 0.85rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  margin: 16px 0;
+}
+
+.stats dt {
+  color: var(--muted);
+}
+
+.stats dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.session-link {
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.date-form {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+}
+
+.date-form label {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
