@@ -1,0 +1,32 @@
+# Entorno
+.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+web/dist/
+coverage/
+*.tsbuildinfo
+
+# Brain: el bundle se genera desde el vault
+brain/out/
+
+# Editores y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/worktrees/
+.claude/settings.local.json

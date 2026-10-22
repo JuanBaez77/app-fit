@@ -1,0 +1,7 @@
+# Fin de línea LF en todo el repo: los archivos se montan en contenedores Linux
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.jpg binary
+*.webp binary
