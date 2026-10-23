@@ -5,6 +5,7 @@ import {
   clearSession,
   login,
   NetworkError,
+  refresh,
   request,
   setSessionExpiredHandler,
 } from './client'
@@ -78,6 +79,19 @@ describe('request', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
 
     await expect(request('/me')).rejects.toBeInstanceOf(NetworkError)
+  })
+
+  test('la API caída detrás del proxy (502–504) es falta de red, no sesión vencida', async () => {
+    const expired = vi.fn()
+    setSessionExpiredHandler(expired)
+    mockFetch({
+      'POST /api/auth/refresh': () => new Response('Bad Gateway', { status: 502 }),
+      'GET /api/me': () => new Response('', { status: 504 }),
+    })
+
+    await expect(refresh()).rejects.toBeInstanceOf(NetworkError)
+    await expect(request('/me')).rejects.toBeInstanceOf(NetworkError)
+    expect(expired).not.toHaveBeenCalled()
   })
 
   test('el mensaje de error sale del detail de la API', async () => {

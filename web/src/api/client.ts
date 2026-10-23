@@ -15,6 +15,12 @@ export class ApiError extends Error {
 /** No hubo respuesta del servidor: sin red, o la API caída. */
 export class NetworkError extends Error {}
 
+/**
+ * Respuestas del proxy (nginx, o Vite en desarrollo) cuando la API no contesta. No dicen nada
+ * de la sesión: tratarlas como un 401 cerraría la sesión y dejaría los datos locales sin abrir.
+ */
+const GATEWAY_ERRORS = new Set([502, 503, 504])
+
 interface TokenOut {
   access_token: string
 }
@@ -42,11 +48,14 @@ async function send(path: string, init: RequestInit = {}): Promise<Response> {
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
   const signal = init.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+  let response: Response
   try {
-    return await fetch(BASE + path, { ...init, headers, signal, credentials: 'same-origin' })
+    response = await fetch(BASE + path, { ...init, headers, signal, credentials: 'same-origin' })
   } catch {
     throw new NetworkError('Sin conexión con el servidor')
   }
+  if (GATEWAY_ERRORS.has(response.status)) throw new NetworkError('El servidor no responde')
+  return response
 }
 
 async function errorFrom(response: Response): Promise<ApiError> {

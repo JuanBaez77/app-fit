@@ -71,6 +71,19 @@ test('sin red entra con el último usuario conocido', async () => {
   expect(await screen.findByText(/Sin conexión/)).toBeInTheDocument()
 })
 
+test('con la API caída (502) sigue con el último usuario y no lo borra', async () => {
+  localStorage.setItem('appfit.user', JSON.stringify(USER))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(new Response('Bad Gateway', { status: 502 }))),
+  )
+  renderApp()
+
+  expect(await screen.findByRole('heading', { name: 'Hoy' })).toBeInTheDocument()
+  expect(await screen.findByText(/Sin conexión/)).toBeInTheDocument()
+  expect(localStorage.getItem('appfit.user')).not.toBeNull()
+})
+
 test('sin red y sin usuario conocido pide login', async () => {
   vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
   renderApp()
