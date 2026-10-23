@@ -165,3 +165,51 @@ test('sin cambios no se puede guardar', async () => {
 
   expect(screen.getByRole('button', { name: 'Guardar versión 2' })).toBeDisabled()
 })
+
+test('un ejercicio nuevo se crea, sube antes que la versión y queda en el día', async () => {
+  await db.muscles.bulkPut([{ id: 'triceps', name: 'Tríceps', parent_id: null }])
+  const calls: string[] = []
+  let pushed: { exercises: { id: string; name: string }[] } = { exercises: [] }
+  let sent: { days: { exercises: { exercise_id: string }[] }[] } = { days: [] }
+  mockFetch({
+    'POST /api/sync/push': (init) => {
+      calls.push('push')
+      pushed = JSON.parse(String(init?.body)) as typeof pushed
+      return json({ applied: 1, skipped: 0, rejected: [] })
+    },
+    'GET /api/sync/pull': () => {
+      calls.push('pull')
+      return json({
+        cursor: '2026-10-22T21:00:00+00:00',
+        sessions: [],
+        set_logs: [],
+        body_weights: [],
+        exercises: [],
+        routines: [],
+        profile: null,
+        muscles: [],
+      })
+    },
+    'POST /api/routines/r1/versions': (init) => {
+      calls.push('version')
+      sent = JSON.parse(String(init?.body)) as typeof sent
+      return json(V2, 201)
+    },
+  })
+  renderEditor()
+
+  await card('Remo en T')
+  await userEvent.click(screen.getByRole('button', { name: /Crear un ejercicio nuevo/ }))
+  await userEvent.type(screen.getByLabelText('Nombre'), 'Fondos en paralelas')
+  await userEvent.selectOptions(await screen.findByLabelText('Tríceps'), 'Directo (1)')
+  await userEvent.click(screen.getByRole('button', { name: 'Crear ejercicio' }))
+  expect(await card('Fondos en paralelas')).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Guardar versión 2' }))
+
+  await screen.findByRole('status')
+  const fondos = pushed.exercises.find((e) => e.name === 'Fondos en paralelas')
+  expect(fondos).toBeDefined()
+  expect(sent.days[0]!.exercises.at(-1)!.exercise_id).toBe(fondos!.id)
+  // La versión va después de que el ejercicio subió
+  expect(calls.indexOf('version')).toBeGreaterThan(calls.indexOf('push'))
+})

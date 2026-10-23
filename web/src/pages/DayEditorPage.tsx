@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { ApiError, NetworkError } from '../api/client'
+import NewExerciseForm from '../components/NewExerciseForm'
 import { useCurrentRoutine, useExercises } from '../data/hooks'
 import { saveDay, type ItemPayload } from '../data/routineEdit'
 import type { Exercise, Routine, RoutineDay, RoutineDayExercise } from '../db/types'
@@ -159,6 +160,7 @@ function DayEditor({
   const [items, setItems] = useState(() => day.exercises.map(toDraft))
   const [dirty, setDirty] = useState(false)
   const [adding, setAdding] = useState('')
+  const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -311,6 +313,20 @@ function DayEditor({
           Agregar
         </button>
       </div>
+      {creating ? (
+        <NewExerciseForm
+          existing={[...exercises.values()]}
+          onCreated={(exercise) => {
+            update([...items, newDraft(exercise.id)])
+            setCreating(false)
+          }}
+          onCancel={() => setCreating(false)}
+        />
+      ) : (
+        <button type="button" className="link" onClick={() => setCreating(true)}>
+          ¿No está? Crear un ejercicio nuevo
+        </button>
+      )}
 
       {error && (
         <p role="alert" className="error">

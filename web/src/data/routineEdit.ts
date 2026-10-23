@@ -1,6 +1,8 @@
-import { request } from '../api/client'
+import { NetworkError, request } from '../api/client'
 import { db } from '../db/db'
 import type { Routine } from '../db/types'
+import { syncNow } from '../sync/engine'
+import { pendingExercises } from './exercises'
 
 /** Un ejercicio del día como lo recibe la API. Sin routine_day_exercise_id es uno nuevo. */
 export interface ItemPayload {
@@ -25,6 +27,14 @@ export async function saveDay(
   dayId: string,
   exercises: ItemPayload[],
 ): Promise<Routine> {
+  // Un ejercicio recién creado tiene que estar en la API antes que la versión que lo usa
+  const added = exercises.map((e) => e.exercise_id)
+  if ((await pendingExercises(added)).length) {
+    await syncNow()
+    if ((await pendingExercises(added)).length) {
+      throw new NetworkError('El ejercicio nuevo todavía no subió')
+    }
+  }
   const saved = await request<Routine>(`/routines/${routine.id}/versions`, {
     method: 'POST',
     body: JSON.stringify({ days: [{ routine_day_id: dayId, exercises }] }),
