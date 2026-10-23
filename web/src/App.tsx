@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 import { useAuth } from './auth/context'
 import Layout from './components/Layout'
@@ -7,6 +8,9 @@ import CalendarPage from './pages/CalendarPage'
 import Placeholder from './pages/Placeholder'
 import SessionPage from './pages/SessionPage'
 import SyncProvider from './sync/SyncProvider'
+
+// Los gráficos (Recharts) pesan: se cargan recién al abrir Progreso, así el registro abre rápido
+const ProgressPage = lazy(() => import('./pages/ProgressPage'))
 
 export default function App() {
   const { state } = useAuth()
@@ -29,7 +33,14 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<HoyPage />} />
           <Route path="calendario" element={<CalendarPage />} />
-          <Route path="progreso" element={<Placeholder title="Progreso" comingIn="PR-20" />} />
+          <Route
+            path="progreso"
+            element={
+              <Suspense fallback={<p className="muted">Cargando…</p>}>
+                <ProgressPage />
+              </Suspense>
+            }
+          />
           <Route path="analisis" element={<Placeholder title="Análisis" comingIn="PR-27" />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

@@ -177,3 +177,31 @@ export function weeklyVolume(
   }
   return weeks
 }
+
+export interface SessionPoint {
+  sessionId: string
+  date: LocalDate
+  /** Mayor 1RM estimado de la sesión; null si ninguna serie lo permite */
+  e1rm: number | null
+  maxWeight: number
+  /** Series × repeticiones × peso */
+  volume: number
+  sets: SetLog[]
+}
+
+/** Un punto por sesión para el gráfico de un ejercicio (US-13). */
+export function sessionSeries(history: SessionSets[], eligible: boolean): SessionPoint[] {
+  return history.map(({ session, sets }) => {
+    const e1rms = sets
+      .map((s) => estimateOneRm(s.weight_kg, s.reps, eligible))
+      .filter((v): v is number => v !== null)
+    return {
+      sessionId: session.id,
+      date: session.date,
+      e1rm: e1rms.length ? Math.max(...e1rms) : null,
+      maxWeight: Math.max(...sets.map((s) => s.weight_kg)),
+      volume: sets.reduce((sum, s) => sum + s.weight_kg * s.reps, 0),
+      sets,
+    }
+  })
+}
