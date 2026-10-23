@@ -37,7 +37,11 @@ export default function CalendarPage() {
       if (!set.deleted_at)
         setsBySession.set(set.session_id, (setsBySession.get(set.session_id) ?? 0) + 1)
     }
-    return { sessions, setsBySession }
+    // Los nombres de los días de todas las versiones: una sesión vieja apunta a la suya
+    const dayNames = new Map(
+      (await db.routines.toArray()).flatMap((r) => r.days.map((d) => [d.id, d.name] as const)),
+    )
+    return { sessions, setsBySession, dayNames }
   }, [])
 
   if (!data || routine === undefined) return null
@@ -45,7 +49,7 @@ export default function CalendarPage() {
   const trained = trainedSessions(data.sessions, data.setsBySession)
   const trainedByDate = byDate(trained)
   const trainedDates = new Set(trainedByDate.keys())
-  const days = new Map(routine?.days.map((d) => [d.id, d.name]))
+  const days = data.dayNames
   const stats = weekStats(trained, plannedWeekdays(routine).size, today)
   const grid = monthGrid(month.year, month.month)
   const title = new Date(month.year, month.month, 1).toLocaleDateString('es-AR', {

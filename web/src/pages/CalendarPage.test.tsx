@@ -94,3 +94,21 @@ test('navega entre meses', async () => {
 
   expect(screen.getByText(/nov/)).toBeInTheDocument()
 })
+
+test('después de editar la rutina, las sesiones viejas conservan el nombre de su día', async () => {
+  const v1 = routine({ start_on: '2026-10-19', status: 'historica' })
+  await db.routines.bulkPut([
+    v1,
+    routine({
+      id: 'r2',
+      version: 2,
+      start_on: '2026-10-19',
+      days: v1.days.map((d) => ({ ...d, id: `${d.id}-v2` })),
+    }),
+  ])
+  renderCalendar()
+
+  expect(
+    await screen.findByRole('button', { name: /lun 19 oct: entrenado, Torso/ }),
+  ).toBeInTheDocument()
+})
