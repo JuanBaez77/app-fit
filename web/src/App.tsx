@@ -2,10 +2,10 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 import { useAuth } from './auth/context'
 import Layout from './components/Layout'
+import AnalysisPage from './pages/AnalysisPage'
 import HoyPage from './pages/HoyPage'
 import LoginPage from './pages/LoginPage'
 import CalendarPage from './pages/CalendarPage'
-import Placeholder from './pages/Placeholder'
 import SettingsPage from './pages/SettingsPage'
 import DayEditorPage from './pages/DayEditorPage'
 import RoutinePage, { VersionPage } from './pages/RoutinePage'
@@ -48,7 +48,7 @@ export default function App() {
               </Suspense>
             }
           />
-          <Route path="analisis" element={<Placeholder title="Análisis" comingIn="PR-27" />} />
+          <Route path="analisis" element={<AnalysisPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

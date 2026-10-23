@@ -945,3 +945,49 @@ select {
   grid-template-columns: 1fr 11em;
   align-items: center;
 }
+
+.analysis > section {
+  margin-top: 20px;
+}
+
+.analysis-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.assessments {
+  display: grid;
+  gap: 12px;
+  padding-left: 0;
+  list-style: none;
+}
+
+ol.assessments {
+  padding-left: 20px;
+  list-style: decimal;
+}
+
+.assessments p {
+  margin: 4px 0 0;
+}
+
+.status {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.status-progresa {
+  color: var(--ok);
+}
+
+.status-retrocede,
+.status-estancado {
+  color: var(--danger);
+}
+
+.basis {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}

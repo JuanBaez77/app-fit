@@ -94,6 +94,17 @@ describe('request', () => {
     expect(expired).not.toHaveBeenCalled()
   })
 
+  test('un 503 con JSON lo mandó la API: vale su motivo', async () => {
+    mockFetch({
+      'POST /api/analyses': () => json({ detail: 'Falta configurar ANTHROPIC_API_KEY' }, 503),
+    })
+
+    const error = await request('/analyses', { method: 'POST' }).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error).toMatchObject({ status: 503, message: 'Falta configurar ANTHROPIC_API_KEY' })
+  })
+
   test('el mensaje de error sale del detail de la API', async () => {
     mockFetch({
       'POST /api/auth/login': () => json({ detail: 'Correo o contraseña incorrectos' }, 401),

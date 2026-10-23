@@ -18,8 +18,13 @@ export class NetworkError extends Error {}
 /**
  * Respuestas del proxy (nginx, o Vite en desarrollo) cuando la API no contesta. No dicen nada
  * de la sesión: tratarlas como un 401 cerraría la sesión y dejaría los datos locales sin abrir.
+ * Si traen JSON las mandó la API con su motivo (un 503 de "falta configurar la key"), y valen.
  */
 const GATEWAY_ERRORS = new Set([502, 503, 504])
+
+const fromGateway = (response: Response) =>
+  GATEWAY_ERRORS.has(response.status) &&
+  !response.headers.get('Content-Type')?.includes('application/json')
 
 interface TokenOut {
   access_token: string
@@ -54,7 +59,7 @@ async function send(path: string, init: RequestInit = {}): Promise<Response> {
   } catch {
     throw new NetworkError('Sin conexión con el servidor')
   }
-  if (GATEWAY_ERRORS.has(response.status)) throw new NetworkError('El servidor no responde')
+  if (fromGateway(response)) throw new NetworkError('El servidor no responde')
   return response
 }
 
