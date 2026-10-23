@@ -4,9 +4,10 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.deps import DbSession
-from app.routers import auth, me, routines, sync
+from app.routers import analyses, auth, me, routines, sync
 
 app = FastAPI(title="app-fit API")
+app.include_router(analyses.router)
 app.include_router(auth.router)
 app.include_router(me.router)
 app.include_router(routines.router)

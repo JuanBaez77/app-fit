@@ -32,8 +32,8 @@ class AnalysisUnavailable(Exception):
     """Falta algo para poder analizar (el bundle o la rutina)."""
 
 
-def default_call() -> Call:
-    client = anthropic.Anthropic()
+def default_call(api_key: str) -> Call:
+    client = anthropic.Anthropic(api_key=api_key)
     return lambda request: complete(client, request)
 
 
@@ -108,10 +108,22 @@ def run_analysis(
         except BrainError as error:
             return completion, error
 
-    completion, result = attempt(request)
-    # Un rechazo no se arregla reintentando, y sin texto no hay qué corregir
-    if isinstance(result, BrainError) and completion.stop_reason != "refusal" and completion.text:
-        completion, result = attempt(_retry(request, completion, result))
+    try:
+        completion, result = attempt(request)
+        # Un rechazo no se arregla reintentando, y sin texto no hay qué corregir
+        if (
+            isinstance(result, BrainError)
+            and completion.stop_reason != "refusal"
+            and completion.text
+        ):
+            completion, result = attempt(_retry(request, completion, result))
+    except anthropic.APIError as error:
+        # Sin red, key inválida, API saturada: queda registrado y no se pierde nada
+        analysis.status = "fallido"
+        analysis.error = f"La API de Claude no respondió bien: {error}"
+        db.add(analysis)
+        db.commit()
+        return analysis
 
     if isinstance(result, BrainError):
         analysis.status = "fallido"

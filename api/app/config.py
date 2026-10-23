@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     login_max_failures: int = 5
     login_window_minutes: int = 15
 
+    # Análisis del brain. Sin key, POST /analyses responde 503 sin llamar a la API
+    anthropic_api_key: str | None = None
+    brain_model: str = "claude-opus-5-5"
+    brain_effort: str = "high"
+
 
 @lru_cache
 def get_settings() -> Settings:

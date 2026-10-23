@@ -32,6 +32,9 @@ services:
       COOKIE_SECURE: "false"
       # En Windows los cambios de archivos montados no llegan como eventos: la recarga sondea
       WATCHFILES_FORCE_POLLING: "true"
+      # Análisis del brain: sin key, POST /analyses responde 503
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      BRAIN_MODEL: ${BRAIN_MODEL:-claude-opus-5-5}
     ports:
       - "${API_PORT:-8000}:8000"
     volumes:

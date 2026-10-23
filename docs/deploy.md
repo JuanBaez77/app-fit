@@ -20,7 +20,7 @@ Internet ──https──> nginx del host ──> 127.0.0.1:8020 ──> web (n
    sudo git clone git@github.com:JuanBaez77/app-fit.git /opt/production/app-fit
    cd /opt/production/app-fit
    ```
-3. **Variables:** copiá la plantilla y completá `POSTGRES_PASSWORD` y `JWT_SECRET`. Revisá que `APP_PORT` (8020) esté libre con `ss -ltn`.
+3. **Variables:** copiá la plantilla y completá `POSTGRES_PASSWORD` y `JWT_SECRET`, y `ANTHROPIC_API_KEY` para el análisis del brain (sin ella, "Analizar" avisa que falta). Revisá que `APP_PORT` (8020) esté libre con `ss -ltn`.
    ```bash
    cp .env.prod.example .env
    openssl rand -base64 24   # POSTGRES_PASSWORD
@@ -48,7 +48,7 @@ Internet ──https──> nginx del host ──> 127.0.0.1:8020 ──> web (n
            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
            proxy_set_header X-Forwarded-Proto $scheme;
            # El análisis del brain (PR-27) puede tardar
-           proxy_read_timeout 180s;
+           proxy_read_timeout 300s;
        }
    }
    ```
