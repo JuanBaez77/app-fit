@@ -48,10 +48,15 @@ class Draft:
     exercises: dict[uuid.UUID, RoutineDayExercise]
 
 
-def _clone(base: Routine, source: str) -> Draft:
+def _copy(
+    source: Routine,
+) -> tuple[
+    dict[uuid.UUID, RoutineDay], dict[uuid.UUID, RoutineDayExercise], list[RoutineMuscleTarget]
+]:
+    """Días, ejercicios y metas de source con ids nuevos y el linaje hacia source."""
     days: dict[uuid.UUID, RoutineDay] = {}
     exercises: dict[uuid.UUID, RoutineDayExercise] = {}
-    for day in base.days:
+    for day in source.days:
         items = []
         for item in day.exercises:
             copy = RoutineDayExercise(
@@ -69,6 +74,22 @@ def _clone(base: Routine, source: str) -> Draft:
             position=day.position,
             exercises=items,
         )
+    targets = [
+        RoutineMuscleTarget(
+            muscle_id=t.muscle_id,
+            target_sets=t.target_sets,
+            fractional_target=t.fractional_target,
+            range_min=t.range_min,
+            range_max=t.range_max,
+            priority=t.priority,
+        )
+        for t in source.muscle_targets
+    ]
+    return days, exercises, targets
+
+
+def _clone(base: Routine, source: str) -> Draft:
+    days, exercises, targets = _copy(base)
     routine = Routine(
         id=uuid.uuid4(),
         user_id=base.user_id,
@@ -80,17 +101,7 @@ def _clone(base: Routine, source: str) -> Draft:
         start_on=base.start_on,
         review_on=base.review_on,
         days=list(days.values()),
-        muscle_targets=[
-            RoutineMuscleTarget(
-                muscle_id=t.muscle_id,
-                target_sets=t.target_sets,
-                fractional_target=t.fractional_target,
-                range_min=t.range_min,
-                range_max=t.range_max,
-                priority=t.priority,
-            )
-            for t in base.muscle_targets
-        ],
+        muscle_targets=targets,
     )
     return Draft(routine=routine, days=days, exercises=exercises)
 
@@ -216,5 +227,31 @@ def apply_day_edits(edits: list[DayEdit], usable: set[uuid.UUID]) -> Callable[[D
                 item.position = position
                 items.append(item)
             day.exercises = items
+
+    return apply
+
+
+# Volver a una versión (US-19) ---------------------------------------------------------------
+
+
+def restore_from(
+    old: Routine, usable: set[uuid.UUID], names: dict[uuid.UUID, str]
+) -> Callable[[Draft], None]:
+    """La versión nueva toma los días, ejercicios y metas de old, con el linaje hacia old: un
+    cambio pendiente de un análisis de old se vuelve a encontrar. No borra historia."""
+
+    def apply(draft: Draft) -> None:
+        missing = sorted(
+            {
+                names.get(item.exercise_id, "un ejercicio")
+                for day in old.days
+                for item in day.exercises
+                if item.exercise_id not in usable
+            }
+        )
+        if missing:
+            raise ChangeError(f"Ya no están en el catálogo: {', '.join(missing)}")
+        draft.days, draft.exercises, draft.routine.muscle_targets = _copy(old)
+        draft.routine.days = list(draft.days.values())
 
     return apply

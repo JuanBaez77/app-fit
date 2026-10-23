@@ -95,6 +95,8 @@ export interface Routine {
   status: 'vigente' | 'historica'
   source: 'importada' | 'manual' | 'brain' | null
   parent_routine_id: string | null
+  /** El análisis cuyo cambio la creó. Las versiones bajadas antes de PR-29 no lo traen. */
+  from_analysis_id?: string | null
   start_on: LocalDate | null
   review_on: LocalDate | null
   days: RoutineDay[]

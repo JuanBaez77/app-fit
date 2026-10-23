@@ -46,3 +46,16 @@ export async function saveDay(
   })
   return saved
 }
+
+/**
+ * Vuelve a una versión anterior (US-19): la API crea otra con su contenido y la historia
+ * queda entera. Necesita conexión; la versión nueva queda en el celular sin esperar al pull.
+ */
+export async function restoreVersion(routine: Routine): Promise<Routine> {
+  const saved = await request<Routine>(`/routines/${routine.id}/restore`, { method: 'POST' })
+  await db.transaction('rw', db.routines, async () => {
+    await db.routines.where('status').equals('vigente').modify({ status: 'historica' })
+    await db.routines.put(saved)
+  })
+  return saved
+}

@@ -2,6 +2,8 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 import { useAuth } from './auth/context'
 import Layout from './components/Layout'
+import AnalysisDetailPage from './pages/AnalysisDetailPage'
+import AnalysisHistoryPage from './pages/AnalysisHistoryPage'
 import AnalysisPage from './pages/AnalysisPage'
 import HoyPage from './pages/HoyPage'
 import LoginPage from './pages/LoginPage'
@@ -49,6 +51,8 @@ export default function App() {
             }
           />
           <Route path="analisis" element={<AnalysisPage />} />
+          <Route path="analisis/historial" element={<AnalysisHistoryPage />} />
+          <Route path="analisis/:id" element={<AnalysisDetailPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

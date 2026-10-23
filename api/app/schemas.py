@@ -49,6 +49,8 @@ class RoutineOut(OrmModel):
     status: str
     source: str | None
     parent_routine_id: uuid.UUID | None
+    # El análisis cuyo cambio la creó, si es del brain
+    from_analysis_id: uuid.UUID | None
     start_on: date | None
     review_on: date | None
     days: list[RoutineDayOut]
