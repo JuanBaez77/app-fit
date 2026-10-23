@@ -36,6 +36,8 @@ services:
       - "${API_PORT:-8000}:8000"
     volumes:
       - ./api:/app
+      # Fixtures dorados de métricas, compartidos con la web (tests/test_metrics.py)
+      - ./fixtures:/fixtures:ro
     depends_on:
       db:
         condition: service_healthy
