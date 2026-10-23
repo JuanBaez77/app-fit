@@ -153,7 +153,7 @@ def test_since_filtra_lo_que_no_cambio(client: TestClient, auth: Headers, exerci
 
 
 def test_no_se_pueden_pisar_filas_de_otro_usuario(
-    client: TestClient, auth: Headers, db: Session
+    client: TestClient, auth: Headers, db: Session, caplog: pytest.LogCaptureFixture
 ) -> None:
     session = session_row()
     push(client, auth, sessions=[session])
@@ -165,6 +165,9 @@ def test_no_se_pueden_pisar_filas_de_otro_usuario(
 
     assert result["rejected"][0]["reason"] == "La fila es de otro usuario"
     assert pull(client, other)["sessions"] == []
+    # Queda en el log, que es donde se revisa (docs/runbook.md)
+    assert f"sync rechazó sessions {session['id']}" in caplog.text
+    assert "La fila es de otro usuario" in caplog.text
 
 
 def test_series_en_sesion_ajena(

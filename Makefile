@@ -4,7 +4,8 @@ API := $(COMPOSE) run --rm --no-deps api
 API_DB := $(COMPOSE) run --rm api
 
 .DEFAULT_GOAL := help
-.PHONY: help up down logs ps migrate dev-user deploy upload-bundle interaction web web-build \
+.PHONY: help up down logs ps migrate dev-user deploy upload-bundle interaction restore-test \
+        web web-build \
         check lint lint-api lint-web test test-api test-web fmt fmt-api fmt-web
 
 help: ## Lista los comandos
@@ -39,6 +40,9 @@ interaction: ## Mediana semanal del tiempo por serie (meta: 5 s); en el VPS con 
 	@if [ -n "$(HOST)" ]; then \
 	  ssh $(HOST) "cd $${DEPLOY_DIR:-/opt/production/app-fit} && docker compose -f docker-compose.prod.yml exec -T api python -m app.cli interaction"; \
 	else $(API_DB) python -m app.cli interaction; fi
+
+restore-test: ## Prueba que un backup se restaura: sin argumentos, con un dump nuevo; o DUMP=archivo
+	sh scripts/restore-test.sh $(DUMP)
 
 web: ## Vite con recarga en caliente en http://localhost:5173
 	cd web && npm run dev

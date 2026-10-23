@@ -9,6 +9,7 @@ menos un margen, para no perder filas de transacciones que confirmaron un poco m
 Repetir filas no hace daño: el cliente también escribe por id.
 """
 
+import logging
 import uuid
 from collections.abc import Callable
 from datetime import datetime, timedelta
@@ -47,6 +48,10 @@ from app.schemas_sync import (
 
 PULL_OVERLAP = timedelta(seconds=30)
 
+# Una fila rechazada sale de la cola del celular y queda solo ahí: el log es donde se ve
+# (docs/runbook.md, "Errores de sincronización")
+log = logging.getLogger("app.sync")
+
 
 def _decimal(value: float | None) -> Decimal | None:
     return None if value is None else Decimal(str(value))
@@ -61,6 +66,7 @@ class _Push:
         self.muscles = set(db.scalars(select(Muscle.id)))
 
     def reject(self, table: str, row_id: uuid.UUID, reason: str) -> None:
+        log.warning("sync rechazó %s %s del usuario %s: %s", table, row_id, self.user.id, reason)
         self.result.rejected.append(Rejected(table=table, id=row_id, reason=reason))
 
     def upsert(

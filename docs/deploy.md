@@ -90,7 +90,7 @@ Copia `brain/out/latest.json` y sus dos archivos a `brain-out/` en el servidor y
   ```bash
   scp 'sv-gcg:/opt/production/app-fit/backups/*.dump' ./respaldos-app-fit/
   ```
-- Restaurar: [docs/runbook.md](runbook.md) (llega con PR-32).
+- Probar que un backup se restaura, y restaurar de verdad: [docs/runbook.md](runbook.md).
 
 ## Si algo falla
 
@@ -99,3 +99,5 @@ docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml logs --tail 100 api
 docker compose -f docker-compose.prod.yml logs backup
 ```
+
+Para el resto (errores de sincronización, análisis fallidos, restaurar un backup): [docs/runbook.md](runbook.md).
