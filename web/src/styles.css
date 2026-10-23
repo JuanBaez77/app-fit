@@ -991,3 +991,31 @@ ol.assessments {
   font-size: 0.9rem;
   overflow-wrap: anywhere;
 }
+
+.changes {
+  padding: 0;
+  list-style: none;
+}
+
+.change h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.change-what {
+  font-weight: 600;
+}
+
+.change-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.change-status {
+  font-weight: 600;
+}
+
+.change-aceptado {
+  color: var(--ok);
+}

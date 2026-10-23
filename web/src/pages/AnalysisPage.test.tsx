@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { saveWeight } from '../data/bodyWeights'
 import { db } from '../db/db'
-import { routine } from '../test-data'
+import { EXERCISES, routine } from '../test-data'
 import { json, mockFetch } from '../test-utils'
 import AnalysisPage from './AnalysisPage'
 
@@ -103,8 +103,8 @@ const ANALYSIS = {
       id: 'c1',
       position: 1,
       type: 'set_sets',
-      target: { routine_day_exercise_id: 'i1', from: 4, to: 5 },
-      title: 'Sumar 1 serie de laterales',
+      target: { routine_day_exercise_id: 'rde-banca', from: 3, to: 4 },
+      title: 'Sumar 1 serie de banca',
       rationale: 'Volumen bajo.',
       expectation: 'Acercarse al rango.',
       basis: 'evidencia',
@@ -134,6 +134,7 @@ beforeEach(async () => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(MONDAY)
   await db.routines.put(routine())
+  await db.exercises.bulkPut(EXERCISES)
   await db.muscles.put({ id: 'deltoides_lateral', name: 'Deltoides lateral', parent_id: null })
 })
 
@@ -179,7 +180,14 @@ test('muestra el último análisis con las cifras de la app y la base de cada co
   expect(
     within(screen.getByRole('list', { name: 'Datos que faltan' })).getByText(/38 %/),
   ).toBeInTheDocument()
-  expect(screen.getByText('Sumar 1 serie de laterales')).toBeInTheDocument()
+  const card = screen.getByRole('listitem', { name: 'Sumar 1 serie de banca' })
+  expect(
+    await within(card).findByText('Press de banca con barra (Torso): 3 → 4 series'),
+  ).toBeInTheDocument()
+  expect(card).toHaveTextContent('Por qué: Volumen bajo.')
+  expect(card).toHaveTextContent('Qué esperar: Acercarse al rango.')
+  expect(card).toHaveTextContent('Base: evidencia · nivel 1 · [[volumen-semanal-dosis-respuesta]]')
+  expect(screen.getByText('1 por decidir')).toBeInTheDocument()
 })
 
 test('Analizar sube lo pendiente primero y pide la ventana elegida con el día del celular', async () => {
@@ -322,4 +330,95 @@ test('si no se pudo sincronizar, no pide el análisis', async () => {
     'No se pudieron subir los datos del celular',
   )
   expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false)
+})
+
+// Aceptar y rechazar (US-18) ------------------------------------------------------------------
+
+const [CHANGE] = ANALYSIS.changes
+const ACCEPT = 'POST /api/analyses/a1/changes/c1/accept'
+
+function withLatest(routes: Parameters<typeof mockFetch>[0]) {
+  return mockFetch({
+    'GET /api/analyses': () => json([SUMMARY]),
+    'GET /api/analyses/a1': () => json(ANALYSIS),
+    'GET /api/sync/pull': () => json(PULL),
+    ...routes,
+  })
+}
+
+test('aceptar crea la versión nueva y queda en el celular', async () => {
+  const v2 = routine({ id: 'r2', version: 2, source: 'brain', parent_routine_id: 'r1' })
+  withLatest({
+    [ACCEPT]: () =>
+      json({
+        change: { ...CHANGE, status: 'aceptado', applied_routine_id: 'r2' },
+        routine: v2,
+        reason: null,
+      }),
+  })
+  renderPage()
+
+  const card = await screen.findByRole('listitem', { name: 'Sumar 1 serie de banca' })
+  await userEvent.click(within(card).getByRole('button', { name: 'Aceptar' }))
+
+  expect(await within(card).findByRole('status')).toHaveTextContent(
+    '✓ Aceptado: creó la versión 2.',
+  )
+  expect(within(card).getByRole('link', { name: 'versión 2' })).toHaveAttribute(
+    'href',
+    '/rutina/version/r2',
+  )
+  expect(within(card).queryByRole('button', { name: 'Aceptar' })).not.toBeInTheDocument()
+  expect(screen.queryByText('1 por decidir')).not.toBeInTheDocument()
+  expect((await db.routines.get('r2'))?.status).toBe('vigente')
+  expect((await db.routines.get('r1'))?.status).toBe('historica')
+})
+
+test('rechazar no toca la rutina', async () => {
+  withLatest({
+    'POST /api/analyses/a1/changes/c1/reject': () =>
+      json({ change: { ...CHANGE, status: 'rechazado' }, routine: null, reason: null }),
+  })
+  renderPage()
+
+  const card = await screen.findByRole('listitem', { name: 'Sumar 1 serie de banca' })
+  await userEvent.click(within(card).getByRole('button', { name: 'Rechazar' }))
+
+  expect(await within(card).findByRole('status')).toHaveTextContent('Rechazado.')
+  expect(await db.routines.count()).toBe(1)
+  expect((await db.routines.get('r1'))?.status).toBe('vigente')
+})
+
+test('si la rutina cambió desde el análisis, la tarjeta dice que ya no aplica y por qué', async () => {
+  withLatest({
+    [ACCEPT]: () =>
+      json({
+        change: { ...CHANGE, status: 'obsoleto' },
+        routine: null,
+        reason: 'Series de Press de banca con barra: al analizar era 3 y ahora es 5',
+      }),
+  })
+  renderPage()
+
+  const card = await screen.findByRole('listitem', { name: 'Sumar 1 serie de banca' })
+  await userEvent.click(within(card).getByRole('button', { name: 'Aceptar' }))
+
+  expect(await within(card).findByRole('status')).toHaveTextContent(
+    'Ya no aplica: la rutina cambió desde el análisis. Series de Press de banca con barra: al analizar era 3 y ahora es 5.',
+  )
+})
+
+test('si la API rechaza la decisión, lo dice y el cambio sigue pendiente', async () => {
+  withLatest({
+    [ACCEPT]: () => json({ detail: 'Quitarlo dejaría Torso sin ejercicios' }, 422),
+  })
+  renderPage()
+
+  const card = await screen.findByRole('listitem', { name: 'Sumar 1 serie de banca' })
+  await userEvent.click(within(card).getByRole('button', { name: 'Aceptar' }))
+
+  expect(await within(card).findByRole('alert')).toHaveTextContent(
+    'Quitarlo dejaría Torso sin ejercicios',
+  )
+  expect(within(card).getByRole('button', { name: 'Aceptar' })).toBeEnabled()
 })

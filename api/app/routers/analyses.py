@@ -12,8 +12,10 @@ from sqlalchemy import select
 from app.brain.analyze import AnalysisUnavailable, Call, default_call, run_analysis
 from app.brain.summary import Window, weeks_window
 from app.deps import AppSettings, CurrentUser, DbSession
-from app.models import Analysis, Routine
-from app.schemas import OrmModel
+from app.models import Analysis, AnalysisChange, Routine
+from app.schemas import OrmModel, RoutineOut
+from app.services.brain_changes import Obsolete, accept
+from app.services.versions import ChangeError
 
 router = APIRouter(prefix="/analyses", tags=["analyses"])
 
@@ -160,3 +162,64 @@ def get_analysis(analysis_id: uuid.UUID, user: CurrentUser, db: DbSession) -> An
     if analysis is None or analysis.user_id != user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No existe ese análisis")
     return AnalysisOut.model_validate(analysis)
+
+
+# Aceptar o rechazar (US-18) -------------------------------------------------------------------
+
+
+class DecisionOut(BaseModel):
+    change: ChangeOut
+    # La versión que creó, si se aceptó
+    routine: RoutineOut | None = None
+    # Por qué quedó obsoleto, si ya no aplicaba
+    reason: str | None = None
+
+
+def _pending(
+    db: DbSession, user: CurrentUser, analysis_id: uuid.UUID, change_id: uuid.UUID
+) -> AnalysisChange:
+    """El cambio, bloqueado: un doble toque espera al primero y ve que ya se decidió."""
+    change = db.get(AnalysisChange, change_id, with_for_update=True)
+    analysis = db.get(Analysis, analysis_id)
+    if (
+        change is None
+        or analysis is None
+        or change.analysis_id != analysis.id
+        or analysis.user_id != user.id
+    ):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No existe ese cambio")
+    if change.status != "pendiente":
+        raise HTTPException(status.HTTP_409_CONFLICT, f"El cambio ya está {change.status}")
+    return change
+
+
+@router.post("/{analysis_id}/changes/{change_id}/accept")
+def accept_change(
+    analysis_id: uuid.UUID, change_id: uuid.UUID, user: CurrentUser, db: DbSession
+) -> DecisionOut:
+    """Crea una versión nueva de la rutina con el cambio. Si ya no aplica a la vigente, el
+    cambio pasa a obsoleto y la respuesta dice por qué."""
+    change = _pending(db, user, analysis_id, change_id)
+    try:
+        routine = accept(db, user, change)
+    except Obsolete as error:
+        change.status = "obsoleto"
+        change.decided_at = datetime.now(UTC)
+        db.commit()
+        return DecisionOut(change=ChangeOut.model_validate(change), reason=str(error))
+    except ChangeError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from None
+    return DecisionOut(
+        change=ChangeOut.model_validate(change), routine=RoutineOut.model_validate(routine)
+    )
+
+
+@router.post("/{analysis_id}/changes/{change_id}/reject")
+def reject_change(
+    analysis_id: uuid.UUID, change_id: uuid.UUID, user: CurrentUser, db: DbSession
+) -> DecisionOut:
+    change = _pending(db, user, analysis_id, change_id)
+    change.status = "rechazado"
+    change.decided_at = datetime.now(UTC)
+    db.commit()
+    return DecisionOut(change=ChangeOut.model_validate(change))

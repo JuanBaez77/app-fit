@@ -95,12 +95,19 @@ def _clone(base: Routine, source: str) -> Draft:
     return Draft(routine=routine, days=days, exercises=exercises)
 
 
-def new_version(db: Session, base: Routine, source: str, apply: Callable[[Draft], None]) -> Routine:
+def new_version(
+    db: Session,
+    base: Routine,
+    source: str,
+    apply: Callable[[Draft], None],
+    then: Callable[[Routine], None] | None = None,
+) -> Routine:
     """Crea la versión siguiente de base en una sola transacción.
 
     base tiene que venir bloqueada (SELECT ... FOR UPDATE): dos ediciones a la vez no pueden
     dejar dos vigentes. apply recibe la copia y le aplica los cambios; si tira ChangeError,
-    no se guarda nada.
+    no se guarda nada. then corre con la versión ya insertada y antes del commit, para lo que
+    tiene que apuntarle (el cambio del brain que la creó).
     """
     if base.status != "vigente":
         raise StaleRoutine
@@ -115,6 +122,9 @@ def new_version(db: Session, base: Routine, source: str, apply: Callable[[Draft]
     db.flush()
     draft.routine.created_at = draft.routine.updated_at = draft.routine.synced_at = now
     db.add(draft.routine)
+    if then is not None:
+        db.flush()
+        then(draft.routine)
     db.commit()
     return draft.routine
 
