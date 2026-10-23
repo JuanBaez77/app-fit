@@ -1,11 +1,29 @@
 """Un Claude de mentira para los tests del análisis: no llama a la API ni gasta."""
 
 import json
+from datetime import UTC, datetime
 from typing import Any
 
+import httpx2
+from fastapi.testclient import TestClient
+
 from app.brain.client import Completion
+from app.main import app
+from app.routers.analyses import brain_call
 
 PAGES = ["volumen", "press-de-banca", "rir"]
+
+TODAY = datetime.now(UTC).date()
+
+
+def use(call: Any) -> None:
+    """Las llamadas a Claude de la API pasan por call."""
+    app.dependency_overrides[brain_call] = lambda: call
+
+
+def analyze(client: TestClient, auth: dict[str, str], **body: Any) -> httpx2.Response:
+    """POST /analyses con el día de hoy."""
+    return client.post("/analyses", headers=auth, json={"today": TODAY.isoformat(), **body})
 
 
 class FakeClaude:

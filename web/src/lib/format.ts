@@ -12,7 +12,8 @@ export const decimal = (value: number): string => oneDecimal.format(value)
 /** "80×8" */
 export const setText = (weightKg: number, reps: number): string => `${kg(weightKg)}×${reps}`
 
-function range(min: number | null, max: number | null): string | null {
+/** "6–10", o "8" si los dos son iguales */
+export function range(min: number | null, max: number | null): string | null {
   if (min === null) return null
   return max === null || max === min ? `${min}` : `${min}–${max}`
 }

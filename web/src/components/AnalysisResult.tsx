@@ -1,6 +1,8 @@
-import type { Analysis, AnalysisMetrics, Basis, ExerciseStatus } from '../data/analyses'
+import type { Analysis, AnalysisMetrics, Decision, ExerciseStatus } from '../data/analyses'
 import { parseLocalDate, shortDate } from '../lib/dates'
 import { decimal, kg } from '../lib/format'
+import BasisLine from './BasisLine'
+import ChangeCard from './ChangeCard'
 
 const STATUS: Record<ExerciseStatus, { symbol: string; label: string }> = {
   progresa: { symbol: '↑', label: 'progresa' },
@@ -33,25 +35,6 @@ function weeklyAverage(metrics: AnalysisMetrics): Map<string, number> {
   return new Map([...totals].map(([muscle, total]) => [muscle, total / weeks]))
 }
 
-/** De dónde sale una afirmación: evidencia (con nivel y páginas del brain) o práctica. */
-function BasisLine({
-  basis,
-  links,
-  level = null,
-}: {
-  basis: Basis
-  links: string[]
-  level?: number | null
-}) {
-  const kind = basis === 'evidencia' ? `evidencia${level ? ` · nivel ${level}` : ''}` : 'práctica'
-  return (
-    <p className="basis muted">
-      Base: {kind}
-      {links.length > 0 && ` · ${links.map((link) => `[[${link}]]`).join(' ')}`}
-    </p>
-  )
-}
-
 /**
  * El diagnóstico (US-17). Las cifras salen de lo que calculó la app y se mandó al brain; del
  * modelo son solo los comentarios, cada uno con su base.
@@ -59,11 +42,15 @@ function BasisLine({
 export default function AnalysisResult({
   analysis,
   muscleName,
+  onDecided,
 }: {
   analysis: Analysis
   muscleName: (id: string) => string
+  /** Se aceptó o rechazó un cambio: la respuesta de la API */
+  onDecided: (decision: Decision) => void
 }) {
   const { metrics, response } = analysis
+  const pending = analysis.changes.filter((c) => c.status === 'pendiente').length
   const period = `Del ${shortDate(analysis.window_from)} al ${shortDate(analysis.window_to)}`
 
   if (analysis.status === 'fallido' || !response) {
@@ -232,15 +219,36 @@ export default function AnalysisResult({
         </section>
       )}
 
-      {analysis.changes.length > 0 && (
+      {(analysis.changes.length > 0 || analysis.discarded) && (
         <section aria-labelledby="analysis-changes">
-          <h2 id="analysis-changes">Cambios propuestos</h2>
-          <ol className="assessments">
+          <div className="analysis-heading">
+            <h2 id="analysis-changes">Cambios propuestos</h2>
+            {pending > 0 && <span>{pending} por decidir</span>}
+          </div>
+          <p className="muted">Nada cambia en la rutina hasta que aceptás.</p>
+          <ol className="changes">
             {analysis.changes.map((change) => (
-              <li key={change.id}>{change.title}</li>
+              <ChangeCard
+                key={change.id}
+                analysisId={analysis.id}
+                change={change}
+                muscleName={muscleName}
+                onDecided={onDecided}
+              />
             ))}
           </ol>
-          <p className="muted">Aceptarlos o rechazarlos llega en PR-28.</p>
+          {analysis.discarded && (
+            <>
+              <h3>Descartados al validar</h3>
+              <ul className="assessments" aria-label="Descartados">
+                {analysis.discarded.map((d) => (
+                  <li key={d.position} className="muted">
+                    {d.title}: {d.reason}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </section>
       )}
     </section>

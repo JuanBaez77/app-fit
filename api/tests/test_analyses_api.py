@@ -1,47 +1,20 @@
 """Los endpoints de análisis, con el cliente de Claude simulado: no llaman a la API."""
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, timedelta
 from typing import Any
 
 import anthropic
 import httpx2
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.brain.client import Completion
 from app.config import get_settings
 from app.main import app
-from app.models import AppUser, BrainBundle
-from app.routers.analyses import brain_call
+from app.models import AppUser
 from app.security import create_access_token
 from tests.factories import make_user
-from tests.fakes import PAGES, FakeClaude, answer, change
-
-TODAY = datetime.now(UTC).date()
-
-
-@pytest.fixture
-def ready(client: TestClient, auth: dict[str, str], db: Session) -> TestClient:
-    client.post("/routines/import", headers=auth)
-    db.add(
-        BrainBundle(
-            version="abc1234",
-            built_at=datetime(2026, 10, 22, tzinfo=UTC),
-            pages_json=PAGES,
-            content="<brain/>",
-        )
-    )
-    db.flush()
-    return client
-
-
-def use(call: Any) -> None:
-    app.dependency_overrides[brain_call] = lambda: call
-
-
-def post(client: TestClient, auth: dict[str, str], **body: Any) -> httpx2.Response:
-    return client.post("/analyses", headers=auth, json={"today": TODAY.isoformat(), **body})
+from tests.fakes import TODAY, FakeClaude, analyze, answer, change, use
 
 
 def test_pedir_y_leer_un_analisis(ready: TestClient, auth: dict[str, str]) -> None:
@@ -51,7 +24,7 @@ def test_pedir_y_leer_un_analisis(ready: TestClient, auth: dict[str, str]) -> No
         )
     )
 
-    response = post(ready, auth, window="4w")
+    response = analyze(ready, auth, window="4w")
 
     assert response.status_code == 201, response.text
     created = response.json()
@@ -75,8 +48,8 @@ def test_pedir_y_leer_un_analisis(ready: TestClient, auth: dict[str, str]) -> No
 def test_ventanas(ready: TestClient, auth: dict[str, str]) -> None:
     use(FakeClaude(answer()))
 
-    week = post(ready, auth, window="1w").json()
-    version = post(ready, auth, window="version").json()
+    week = analyze(ready, auth, window="1w").json()
+    version = analyze(ready, auth, window="version").json()
 
     assert week["window_from"] == (TODAY - timedelta(days=7)).isoformat()
     # La v1 rige desde el inicio de la rutina importada
@@ -94,7 +67,7 @@ def test_si_la_api_de_claude_falla_queda_registrado(
 
     use(broken)
 
-    response = post(ready, auth)
+    response = analyze(ready, auth)
 
     assert response.status_code == 201
     assert response.json()["status"] == "fallido"
@@ -106,7 +79,7 @@ def test_sin_bundle_avisa(client: TestClient, auth: dict[str, str]) -> None:
     client.post("/routines/import", headers=auth)
     use(FakeClaude(answer()))
 
-    response = post(client, auth)
+    response = analyze(client, auth)
 
     assert response.status_code == 409
     assert "bundle" in response.json()["detail"]
@@ -115,7 +88,7 @@ def test_sin_bundle_avisa(client: TestClient, auth: dict[str, str]) -> None:
 def test_sin_rutina_avisa(client: TestClient, auth: dict[str, str]) -> None:
     use(FakeClaude(answer()))
 
-    assert post(client, auth).status_code == 409
+    assert analyze(client, auth).status_code == 409
 
 
 def test_la_fecha_del_celular_tiene_que_ser_hoy(ready: TestClient, auth: dict[str, str]) -> None:
@@ -132,7 +105,7 @@ def test_el_analisis_de_otro_usuario_no_existe(
     ready: TestClient, auth: dict[str, str], db: Session
 ) -> None:
     use(FakeClaude(answer()))
-    created = post(ready, auth).json()
+    created = analyze(ready, auth).json()
     stranger: AppUser = make_user(db)
     other = {"Authorization": f"Bearer {create_access_token(stranger.id, get_settings())}"}
 
@@ -151,7 +124,7 @@ def test_sin_api_key_avisa_antes_de_llamar(ready: TestClient, auth: dict[str, st
         update={"anthropic_api_key": None}
     )
 
-    response = post(ready, auth)
+    response = analyze(ready, auth)
 
     assert response.status_code == 503
     assert "ANTHROPIC_API_KEY" in response.json()["detail"]

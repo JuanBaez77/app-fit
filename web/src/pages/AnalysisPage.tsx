@@ -8,6 +8,7 @@ import {
   SyncFailed,
   type Analysis,
   type AnalysisWindow,
+  type Decision,
 } from '../data/analyses'
 import { useCurrentRoutine } from '../data/hooks'
 import { db } from '../db/db'
@@ -87,6 +88,16 @@ export default function AnalysisPage() {
     }
   }
 
+  function decided({ change }: Decision) {
+    setAnalysis(
+      (current) =>
+        current && {
+          ...current,
+          changes: current.changes.map((c) => (c.id === change.id ? change : c)),
+        },
+    )
+  }
+
   const blocked = !online
     ? 'Sin conexión: el análisis necesita internet.'
     : routine === null
@@ -147,6 +158,7 @@ export default function AnalysisPage() {
         <AnalysisResult
           analysis={analysis}
           muscleName={(id) => muscles.get(id) ?? id.replace(/_/g, ' ')}
+          onDecided={decided}
         />
       )}
       {analysis === null && !running && !error && (

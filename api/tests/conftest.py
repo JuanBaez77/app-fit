@@ -1,5 +1,6 @@
 import os
 from collections.abc import Iterator
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -14,8 +15,9 @@ from app.cli import create_user
 from app.config import get_settings
 from app.db import get_db
 from app.main import app
-from app.models import AppUser
+from app.models import AppUser, BrainBundle
 from app.security import create_access_token
+from tests.fakes import PAGES
 
 API_DIR = Path(__file__).resolve().parent.parent
 
@@ -91,3 +93,19 @@ def client(db: Session) -> Iterator[TestClient]:
     with TestClient(app, base_url="https://testserver") as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def ready(client: TestClient, auth: dict[str, str], db: Session) -> TestClient:
+    """Con la rutina importada y un bundle: lista para pedir análisis."""
+    client.post("/routines/import", headers=auth)
+    db.add(
+        BrainBundle(
+            version="abc1234",
+            built_at=datetime(2026, 10, 22, tzinfo=UTC),
+            pages_json=PAGES,
+            content="<brain/>",
+        )
+    )
+    db.flush()
+    return client
