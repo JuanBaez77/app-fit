@@ -4,7 +4,7 @@ API := $(COMPOSE) run --rm --no-deps api
 API_DB := $(COMPOSE) run --rm api
 
 .DEFAULT_GOAL := help
-.PHONY: help up down logs ps migrate dev-user deploy upload-bundle web web-build \
+.PHONY: help up down logs ps migrate dev-user deploy upload-bundle interaction web web-build \
         check lint lint-api lint-web test test-api test-web fmt fmt-api fmt-web
 
 help: ## Lista los comandos
@@ -34,6 +34,11 @@ deploy: ## Despliega main en el VPS: make deploy HOST=sv-gcg (ver docs/deploy.md
 
 upload-bundle: ## Registra brain/out/latest.json en la base local, o en el VPS con HOST=sv-gcg
 	sh scripts/upload-bundle.sh $(HOST)
+
+interaction: ## Mediana semanal del tiempo por serie (meta: 5 s); en el VPS con HOST=sv-gcg
+	@if [ -n "$(HOST)" ]; then \
+	  ssh $(HOST) "cd $${DEPLOY_DIR:-/opt/production/app-fit} && docker compose -f docker-compose.prod.yml exec -T api python -m app.cli interaction"; \
+	else $(API_DB) python -m app.cli interaction; fi
 
 web: ## Vite con recarga en caliente en http://localhost:5173
 	cd web && npm run dev
