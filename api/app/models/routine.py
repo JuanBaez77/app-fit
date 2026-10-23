@@ -37,8 +37,11 @@ class Routine(Base):
     status: Mapped[str] = mapped_column(Text)
     source: Mapped[str | None] = mapped_column(Text)
     parent_routine_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("routine.id"))
-    # Si nació de un cambio del brain; la FK a analysis llega con esa tabla (PR-26)
-    from_analysis_id: Mapped[uuid.UUID | None]
+    # Si nació de un cambio del brain. Referencia circular con analysis.routine_id: la FK se
+    # agrega después de crear las dos tablas (use_alter)
+    from_analysis_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("analysis.id", use_alter=True, name="routine_from_analysis_id_fkey")
+    )
     start_on: Mapped[date | None] = mapped_column(Date)
     review_on: Mapped[date | None] = mapped_column(Date)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
