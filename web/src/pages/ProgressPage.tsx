@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import BodyWeightPanel from '../components/BodyWeightPanel'
 import ExerciseProgress from '../components/ExerciseProgress'
 import MuscleVolume from '../components/MuscleVolume'
 
@@ -30,7 +31,7 @@ export default function ProgressPage() {
       <div role="tabpanel" aria-label={tab}>
         {tab === 'Ejercicio' && <ExerciseProgress />}
         {tab === 'Músculos' && <MuscleVolume />}
-        {tab === 'Peso corporal' && <p className="muted">Llega en PR-22.</p>}
+        {tab === 'Peso corporal' && <BodyWeightPanel />}
       </div>
     </main>
   )

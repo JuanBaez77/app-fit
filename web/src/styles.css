@@ -746,3 +746,40 @@ select {
 .trend-weeks li > :last-child {
   text-align: right;
 }
+
+.weight-form {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+}
+
+.weight-form label {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+  font-weight: 500;
+}
+
+.weight-weeks {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.weight-weeks th {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-align: left;
+}
+
+.weight-weeks td,
+.weight-weeks th {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.weight-weeks td:last-child,
+.weight-weeks th:last-child {
+  text-align: right;
+}
