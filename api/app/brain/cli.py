@@ -3,6 +3,7 @@
     python -m app.brain.cli analyze CASO.json --bundle /brain/out/latest.json
     python -m app.brain.cli analyze CASO.json --count-only
     python -m app.brain.cli summary juan@ejemplo.com --weeks 4 --out /brain/cases/mio.json
+    python -m app.brain.cli upload-bundle /brain/out/latest.json
 
 Desde la raíz del repo: sh scripts/brain-analyze.sh CASO.json. Lee la API key de
 ANTHROPIC_API_KEY (o de un perfil de `ant auth login`) y el modelo de BRAIN_MODEL.
@@ -21,6 +22,7 @@ import anthropic
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.brain.bundles import register_bundle
 from app.brain.client import (
     DEFAULT_EFFORT,
     DEFAULT_MODEL,
@@ -133,9 +135,22 @@ def summary(args: argparse.Namespace) -> int:
     return 0
 
 
+def upload_bundle(args: argparse.Namespace) -> int:
+    """Registra el bundle en la base: los análisis usan el último que se subió."""
+    with Session(get_engine()) as db:
+        bundle = register_bundle(db, Path(args.manifest))
+        print(
+            f"Bundle {bundle.version} subido: {len(bundle.pages_json)} páginas citables, "
+            f"~{bundle.estimated_tokens} tokens"
+        )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.brain.cli")
     commands = parser.add_subparsers(dest="command", required=True)
+    upload = commands.add_parser("upload-bundle", help="Registra el bundle del brain en la base")
+    upload.add_argument("manifest", help="latest.json de brain/out")
     build = commands.add_parser("summary", help="Arma el JSON de entrada con datos reales")
     build.add_argument("email")
     build.add_argument("--weeks", type=int, default=4)
@@ -150,7 +165,8 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--count-only", action="store_true", help="Solo cuenta tokens, sin gastar")
     run.add_argument("--out", default="/brain/cases/resultados")
     args = parser.parse_args(argv)
-    return summary(args) if args.command == "summary" else analyze(args)
+    commands_by_name = {"summary": summary, "upload-bundle": upload_bundle, "analyze": analyze}
+    return commands_by_name[args.command](args)
 
 
 if __name__ == "__main__":

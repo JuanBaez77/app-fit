@@ -72,6 +72,17 @@ sh scripts/deploy.sh sv-gcg
 
 Hace `git pull` de `main` en el servidor, reconstruye las imágenes, aplica las migraciones (la api lo hace al arrancar) y espera a que `/api/health` responda.
 
+## Bundle del brain
+
+El análisis usa el último bundle que se subió. Cada vez que cambia el vault:
+
+```bash
+py brain/build_bundle.py
+sh scripts/upload-bundle.sh sv-gcg
+```
+
+Copia `brain/out/latest.json` y sus dos archivos a `brain-out/` en el servidor y los registra en la tabla `brain_bundle`. Sin host (`sh scripts/upload-bundle.sh`), lo registra en la base local de desarrollo.
+
 ## Backups
 
 - El contenedor `backup` hace un `pg_dump` al arrancar y después cada 24 h, en `backups/appfit-AAAAMMDD-HHMMSS.dump`. Borra los de más de `BACKUP_KEEP_DAYS` días (14).
