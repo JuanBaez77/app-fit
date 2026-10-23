@@ -11,6 +11,7 @@ import {
   sessionSeries,
   targetSets,
   volumeSources,
+  weeklyWeights,
   weekStart,
 } from './index'
 
@@ -220,5 +221,36 @@ describe('volumeSources', () => {
       { exercise_id: 'fondos', sets: 1, factor: 1 },
     ])
     expect(volumeSources(sets, sessions, exercises, '2026-10-19', 'espalda')).toEqual([])
+  })
+})
+
+describe('weeklyWeights', () => {
+  test('promedio por semana y variación contra la anterior', () => {
+    const w = (date: string, kg: number, deleted = false) => ({
+      date,
+      kg,
+      deleted_at: deleted ? '2026-10-22T12:00:00.000Z' : null,
+    })
+
+    const weeks = weeklyWeights([
+      // Semana del 5: la primera, sin anterior
+      w('2026-10-06', 84),
+      // Semana del 12: se compara con la del 5; el borrado no cuenta
+      w('2026-10-13', 82),
+      w('2026-10-15', 83),
+      w('2026-10-16', 90, true),
+      // Semana del 26: la del 19 no tiene pesos, no hay variación
+      w('2026-10-26', 81),
+    ])
+
+    expect(weeks.map((x) => [x.week, x.count])).toEqual([
+      ['2026-10-26', 1],
+      ['2026-10-12', 2],
+      ['2026-10-05', 1],
+    ])
+    expect(weeks[0]!.change).toBeNull()
+    expect(weeks[1]!.average).toBe(82.5)
+    expect(weeks[1]!.change).toBeCloseTo(((82.5 - 84) / 84) * 100)
+    expect(weeks[2]!.change).toBeNull()
   })
 })

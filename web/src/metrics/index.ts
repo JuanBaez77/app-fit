@@ -1,8 +1,8 @@
 // Cálculos de la app. El brain interpreta; las cuentas las hace la app (diseño, sección 3).
 // La API tiene las mismas funciones en Python (PR-25), validadas con los mismos fixtures.
 
-import type { LocalDate, RoutineDayExercise, Session, SetLog } from '../db/types'
-import { parseLocalDate } from '../lib/dates'
+import type { BodyWeight, LocalDate, RoutineDayExercise, Session, SetLog } from '../db/types'
+import { localDate, parseLocalDate } from '../lib/dates'
 
 /** Con más repeticiones, la fórmula de Epley pierde precisión: esas series no estiman 1RM. */
 export const E1RM_MAX_REPS = 12
@@ -208,6 +208,44 @@ export function volumeSources(
     sources.set(set.exercise_id, { ...current, sets: current.sets + 1 })
   }
   return [...sources.values()].sort((a, b) => b.sets * b.factor - a.sets * a.factor)
+}
+
+export interface WeightWeek {
+  /** Lunes de la semana */
+  week: LocalDate
+  average: number
+  count: number
+  /** % contra el promedio de la semana anterior; null si esa semana no tiene pesos */
+  change: number | null
+}
+
+/** Promedio del peso corporal por semana, la más nueva primero (US-15). */
+export function weeklyWeights(
+  weights: Pick<BodyWeight, 'date' | 'kg' | 'deleted_at'>[],
+): WeightWeek[] {
+  const byWeek = new Map<LocalDate, number[]>()
+  for (const w of weights) {
+    if (w.deleted_at) continue
+    const week = weekStart(w.date)
+    byWeek.set(week, [...(byWeek.get(week) ?? []), w.kg])
+  }
+  const averages = new Map(
+    [...byWeek].map(([week, kgs]) => [week, kgs.reduce((a, b) => a + b, 0) / kgs.length]),
+  )
+  return [...byWeek.keys()]
+    .sort((a, b) => b.localeCompare(a))
+    .map((week) => {
+      const average = averages.get(week)!
+      const monday = parseLocalDate(week)
+      monday.setDate(monday.getDate() - 7)
+      const previous = averages.get(localDate(monday))
+      return {
+        week,
+        average,
+        count: byWeek.get(week)!.length,
+        change: previous ? ((average - previous) / previous) * 100 : null,
+      }
+    })
 }
 
 export interface SessionPoint {
