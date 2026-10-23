@@ -16,9 +16,14 @@ export default function HoyPage() {
     <main>
       <header className="page-header">
         <h1>Hoy</h1>
-        <Link to="/ajustes" className="link">
-          Ajustes
-        </Link>
+        <nav className="header-links" aria-label="Rutina y ajustes">
+          <Link to="/rutina" className="link">
+            Rutina
+          </Link>
+          <Link to="/ajustes" className="link">
+            Ajustes
+          </Link>
+        </nav>
       </header>
       {routine === undefined || todaySessions === undefined ? null : routine === null ? (
         <FirstUse hasSynced={hasSynced ?? false} />

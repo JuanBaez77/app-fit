@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage'
 import CalendarPage from './pages/CalendarPage'
 import Placeholder from './pages/Placeholder'
 import SettingsPage from './pages/SettingsPage'
+import DayEditorPage from './pages/DayEditorPage'
+import RoutinePage, { VersionPage } from './pages/RoutinePage'
 import SessionPage from './pages/SessionPage'
 import SyncProvider from './sync/SyncProvider'
 
@@ -35,6 +37,9 @@ export default function App() {
           <Route index element={<HoyPage />} />
           <Route path="calendario" element={<CalendarPage />} />
           <Route path="ajustes" element={<SettingsPage />} />
+          <Route path="rutina" element={<RoutinePage />} />
+          <Route path="rutina/dia/:dayId" element={<DayEditorPage />} />
+          <Route path="rutina/version/:id" element={<VersionPage />} />
           <Route
             path="progreso"
             element={
