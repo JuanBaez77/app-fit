@@ -2,6 +2,7 @@
 
     python -m app.cli create-user tu@correo.com
     python -m app.cli set-password tu@correo.com
+    python -m app.cli interaction [tu@correo.com]
 
 La contraseña se pide por teclado; para scripts, se puede pasar en APPFIT_PASSWORD.
 """
@@ -18,6 +19,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.db import get_engine
 from app.models import AppUser
 from app.security import hash_password
+from app.services.interaction import report, weekly_interaction
 
 MIN_PASSWORD_LENGTH = 10
 
@@ -51,12 +53,35 @@ def set_password(db: Session, email: str, password: str) -> None:
     db.commit()
 
 
+def interaction(db: Session, email: str | None) -> str:
+    """La mediana semanal del tiempo por serie (T4.1). Sin correo, la del único usuario."""
+    users = list(db.scalars(select(AppUser).order_by(AppUser.email)))
+    if email is not None:
+        users = [u for u in users if u.email == email.strip().lower()]
+    if len(users) != 1:
+        raise ValueError(
+            "No hay un usuario con ese correo." if email else "Hay varios usuarios: pasá el correo."
+        )
+    return report(weekly_interaction(db, users[0].id))
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("create-user", "set-password"):
         commands.add_parser(name).add_argument("email")
+    commands.add_parser("interaction", help="Mediana semanal del tiempo por serie").add_argument(
+        "email", nargs="?"
+    )
     args = parser.parse_args(argv)
+
+    if args.command == "interaction":
+        with sessionmaker(bind=get_engine())() as db:
+            try:
+                print(interaction(db, args.email))
+            except ValueError as error:
+                sys.exit(str(error))
+        return
 
     password = _read_password()
     with sessionmaker(bind=get_engine())() as db:
