@@ -72,6 +72,8 @@ async function chooseBench() {
     await screen.findByRole('combobox', { name: 'Ejercicio' }),
     'Press de banca con barra',
   )
+  // El historial del ejercicio nuevo llega después del cambio
+  await within(screen.getByRole('list', { name: 'Sesiones' })).findAllByRole('button')
 }
 
 test('solo ofrece ejercicios con series; sin 1RM arranca en peso máximo', async () => {

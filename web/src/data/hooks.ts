@@ -42,16 +42,21 @@ export function useHasSynced(): boolean | undefined {
   return useLiveQuery(async () => Boolean(await db.meta.get('cursor')), [])
 }
 
-/** Series de un ejercicio agrupadas por sesión, de la más vieja a la más nueva. */
+/**
+ * Series de un ejercicio agrupadas por sesión, de la más vieja a la más nueva.
+ * Al cambiar de ejercicio da undefined hasta tener el historial nuevo: useLiveQuery devuelve
+ * el resultado anterior mientras consulta, y sería el de otro ejercicio.
+ */
 export function useExerciseHistory(exerciseId: string | undefined): SessionSets[] | undefined {
-  return useLiveQuery(async () => {
-    if (!exerciseId) return []
+  const result = useLiveQuery(async () => {
+    if (!exerciseId) return { exerciseId, history: [] }
     const sets = await db.set_logs
       .where('[exercise_id+logged_at]')
       .between([exerciseId, Dexie.minKey], [exerciseId, Dexie.maxKey])
       .toArray()
     const ids = [...new Set(sets.map((s) => s.session_id))]
     const sessions = (await db.sessions.bulkGet(ids)).filter((s) => s !== undefined)
-    return groupBySession(sets, new Map(sessions.map((s) => [s.id, s])))
+    return { exerciseId, history: groupBySession(sets, new Map(sessions.map((s) => [s.id, s]))) }
   }, [exerciseId])
+  return result && result.exerciseId === exerciseId ? result.history : undefined
 }

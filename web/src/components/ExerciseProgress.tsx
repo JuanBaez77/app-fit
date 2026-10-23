@@ -48,13 +48,13 @@ export default function ExerciseProgress() {
   const current = exercises?.find((e) => e.id === exerciseId) ?? exercises?.[0]
   const history = useExerciseHistory(current?.id)
 
-  if (!exercises || history === undefined) return null
+  if (!exercises) return null
   if (!current) return <p className="muted">Todavía no hay series registradas.</p>
 
   // Sin 1RM estimado (dominadas) el gráfico arranca en peso máximo
   const shown: Metric = metric === 'e1rm' && !current.e1rm_eligible ? 'maxWeight' : metric
   const since = range.days ? addDays(localDate(), -range.days) : null
-  const all = sessionSeries(history, current.e1rm_eligible)
+  const all = sessionSeries(history ?? [], current.e1rm_eligible)
   const points = all.filter((p) => !since || p.date >= since)
   const data = points.map((p) => ({ ...p, label: shortDate(p.date), value: p[shown] }))
   const detail = points.find((p) => p.sessionId === selected)
@@ -93,7 +93,7 @@ export default function ExerciseProgress() {
       </div>
 
       <h2 className="chart-title">{METRICS[shown].title}</h2>
-      {data.length === 0 ? (
+      {history === undefined ? null : data.length === 0 ? (
         <p className="muted">Sin sesiones en este rango.</p>
       ) : (
         <div
