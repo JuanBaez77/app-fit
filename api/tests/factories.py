@@ -68,12 +68,13 @@ def make_set(
     weight: str = "80",
     reps: int = 8,
     rir: int | None = 2,
+    number: int = 1,
 ) -> SetLog:
     set_log = SetLog(
         id=uuid.uuid4(),
         session_id=session.id,
         exercise_id=exercise.id,
-        set_number=1,
+        set_number=number,
         weight_kg=Decimal(weight),
         reps=reps,
         rir=rir,

@@ -2,6 +2,7 @@
 
     python -m app.brain.cli analyze CASO.json --bundle /brain/out/latest.json
     python -m app.brain.cli analyze CASO.json --count-only
+    python -m app.brain.cli summary juan@ejemplo.com --weeks 4 --out /brain/cases/mio.json
 
 Desde la raíz del repo: sh scripts/brain-analyze.sh CASO.json. Lee la API key de
 ANTHROPIC_API_KEY (o de un perfil de `ant auth login`) y el modelo de BRAIN_MODEL.
@@ -13,10 +14,12 @@ import json
 import os
 import sys
 import time
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import anthropic
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.brain.client import (
     DEFAULT_EFFORT,
@@ -30,6 +33,9 @@ from app.brain.client import (
     unknown_links,
 )
 from app.brain.prompt import PROMPT_VERSION
+from app.brain.summary import build_summary, weeks_window
+from app.db import get_engine
+from app.models import AppUser
 
 
 def analyze(args: argparse.Namespace) -> int:
@@ -108,9 +114,32 @@ def analyze(args: argparse.Namespace) -> int:
     return status
 
 
+def summary(args: argparse.Namespace) -> int:
+    """Arma el JSON de entrada con los datos reales de un usuario, para pasárselo a analyze."""
+    with Session(get_engine()) as db:
+        user = db.scalar(select(AppUser).where(AppUser.email == args.email))
+        if user is None:
+            print(f"No existe el usuario {args.email}", file=sys.stderr)
+            return 1
+        today = date.today()
+        window = weeks_window(today, args.weeks, f"últimas {args.weeks} semanas")
+        data, _ = build_summary(db, user, window, today)
+    text = json.dumps(data, ensure_ascii=False, indent=1)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"Guardado en {args.out}")
+    else:
+        print(text)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.brain.cli")
     commands = parser.add_subparsers(dest="command", required=True)
+    build = commands.add_parser("summary", help="Arma el JSON de entrada con datos reales")
+    build.add_argument("email")
+    build.add_argument("--weeks", type=int, default=4)
+    build.add_argument("--out", help="Archivo de salida; sin esto, va a la pantalla")
     run = commands.add_parser("analyze", help="Corre un caso de prueba contra la API")
     run.add_argument("input", help="JSON de entrada (formato de la sección 5 del diseño)")
     run.add_argument("--bundle", default="/brain/out/latest.json")
@@ -120,7 +149,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     run.add_argument("--count-only", action="store_true", help="Solo cuenta tokens, sin gastar")
     run.add_argument("--out", default="/brain/cases/resultados")
-    return analyze(parser.parse_args(argv))
+    args = parser.parse_args(argv)
+    return summary(args) if args.command == "summary" else analyze(args)
 
 
 if __name__ == "__main__":
