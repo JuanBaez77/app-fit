@@ -783,3 +783,62 @@ select {
 .weight-weeks th:last-child {
   text-align: right;
 }
+
+/* Ajustes */
+.settings {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.settings fieldset {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.settings legend {
+  padding: 0 4px;
+  font-weight: 700;
+}
+
+.settings label {
+  display: grid;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.settings textarea {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+
+.checks > span {
+  grid-column: 1 / -1;
+  font-weight: 500;
+}
+
+.settings label.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  font-weight: 400;
+}
+
+.check input {
+  width: 22px;
+  min-height: 22px;
+  height: 22px;
+}
