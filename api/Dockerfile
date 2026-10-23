@@ -32,4 +32,4 @@ EXPOSE 8000
 # Detrás de nginx: confía en X-Forwarded-For (la red de compose no se publica)
 CMD ["sh", "-c", "alembic upgrade head && exec gunicorn app.main:app \
      --worker-class uvicorn_worker.UvicornWorker --workers ${WEB_WORKERS:-2} \
-     --bind 0.0.0.0:8000 --forwarded-allow-ips '*' --access-logfile -"]
+     --bind 0.0.0.0:8000 --forwarded-allow-ips '*' --access-logfile - --timeout 300"]
