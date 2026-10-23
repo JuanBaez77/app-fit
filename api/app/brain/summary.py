@@ -130,6 +130,17 @@ class Aliases:
             self._exercise_alias[exercise_id] = alias
         return self._exercise_alias[exercise_id]
 
+    def as_json(self) -> dict[str, dict[str, str]]:
+        """Para guardarla con el análisis (analysis.aliases_json)."""
+        return {
+            kind: {alias: str(real) for alias, real in table.items()}
+            for kind, table in (
+                ("exercises", self.exercises),
+                ("items", self.items),
+                ("days", self.days),
+            )
+        }
+
     def item(self, item_id: uuid.UUID) -> str:
         alias = f"rde-{len(self.items) + 1}"
         self.items[alias] = item_id
