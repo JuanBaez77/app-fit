@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { ApiError, NetworkError, request } from '../api/client'
-import { useAuth } from '../auth/context'
 import { useCurrentRoutine, useHasSynced, useSessionsOn } from '../data/hooks'
 import { startSession } from '../data/sessions'
 import type { Routine, RoutineDay } from '../db/types'
@@ -9,7 +8,6 @@ import { isoWeekday, localDate, weekdayName } from '../lib/dates'
 import { syncNow } from '../sync/engine'
 
 export default function HoyPage() {
-  const { signOut } = useAuth()
   const routine = useCurrentRoutine()
   const todaySessions = useSessionsOn(localDate())
   const hasSynced = useHasSynced()
@@ -18,9 +16,9 @@ export default function HoyPage() {
     <main>
       <header className="page-header">
         <h1>Hoy</h1>
-        <button type="button" className="link" onClick={() => void signOut()}>
-          Salir
-        </button>
+        <Link to="/ajustes" className="link">
+          Ajustes
+        </Link>
       </header>
       {routine === undefined || todaySessions === undefined ? null : routine === null ? (
         <FirstUse hasSynced={hasSynced ?? false} />
