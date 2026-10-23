@@ -167,8 +167,14 @@ export async function requestAnalysis(span: AnalysisWindow): Promise<Analysis> {
   })
 }
 
-export function listAnalyses(): Promise<AnalysisSummary[]> {
-  return request<AnalysisSummary[]>('/analyses')
+/** Un análisis en el historial: qué confianza tuvo y qué se decidió de cada cambio. */
+export interface AnalysisListItem extends AnalysisSummary {
+  confidence: BrainResponse['confidence'] | null
+  changes: Pick<AnalysisChange, 'id' | 'title' | 'status'>[]
+}
+
+export function listAnalyses(): Promise<AnalysisListItem[]> {
+  return request<AnalysisListItem[]>('/analyses')
 }
 
 export function getAnalysis(id: string): Promise<Analysis> {

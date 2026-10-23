@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
 import { ApiError, NetworkError } from '../api/client'
 import AnalysisResult from '../components/AnalysisResult'
 import {
@@ -109,6 +110,9 @@ export default function AnalysisPage() {
     <main>
       <header className="page-header">
         <h1>Análisis</h1>
+        <Link to="/analisis/historial" className="link">
+          Historial
+        </Link>
       </header>
 
       <div className="segmented" role="group" aria-label="Ventana">

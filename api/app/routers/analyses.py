@@ -72,6 +72,17 @@ class AnalysisSummaryOut(OrmModel):
     model: str
 
 
+class ChangeBriefOut(OrmModel):
+    id: uuid.UUID
+    title: str
+    status: str
+
+
+class AnalysisListItemOut(AnalysisSummaryOut):
+    confidence: str | None
+    changes: list[ChangeBriefOut]
+
+
 class AnalysisOut(AnalysisSummaryOut):
     prompt_version: str
     error: str | None
@@ -145,15 +156,23 @@ def create_analysis(
 
 
 @router.get("")
-def list_analyses(user: CurrentUser, db: DbSession) -> list[AnalysisSummaryOut]:
-    """Los análisis, el más nuevo primero."""
+def list_analyses(user: CurrentUser, db: DbSession) -> list[AnalysisListItemOut]:
+    """Los análisis, el más nuevo primero, con la confianza y qué se decidió de cada cambio
+    (US-19). Sin las métricas: esas van en GET /analyses/{id}."""
     analyses = db.scalars(
         select(Analysis)
         .where(Analysis.user_id == user.id)
         .order_by(Analysis.created_at.desc())
         .limit(50)
     )
-    return [AnalysisSummaryOut.model_validate(a) for a in analyses]
+    return [
+        AnalysisListItemOut(
+            **AnalysisSummaryOut.model_validate(a).model_dump(),
+            confidence=(a.response_json or {}).get("confidence"),
+            changes=[ChangeBriefOut.model_validate(c) for c in a.changes],
+        )
+        for a in analyses
+    ]
 
 
 @router.get("/{analysis_id}")

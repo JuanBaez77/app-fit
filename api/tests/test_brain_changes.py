@@ -220,3 +220,21 @@ def test_cada_tipo_de_cambio_se_aplica(ready: TestClient, auth: Headers, db: Ses
     # Las directas suben 2 y el objetivo fraccional se corre lo mismo
     assert (target["target_sets"], target["fractional_target"]) == (8, 12.5)
     assert (target["range_min"], target["range_max"]) == (6, 9)
+
+
+def test_el_historial_dice_que_se_decidio_de_cada_analisis(
+    ready: TestClient, auth: Headers
+) -> None:
+    analysis = analysis_with(ready, auth, SETS, REPS)
+    decide(ready, auth, analysis, 0, "accept")
+    decide(ready, auth, analysis, 1, "reject")
+
+    [listed] = ready.get("/analyses", headers=auth).json()
+
+    assert listed["confidence"] == "media"
+    assert [(c["title"], c["status"]) for c in listed["changes"]] == [
+        ("Cambio set_sets", "aceptado"),
+        ("Cambio set_rep_range", "rechazado"),
+    ]
+    # La versión que creó apunta al análisis
+    assert current(ready, auth)["from_analysis_id"] == analysis["id"]

@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Response, status
 from sqlalchemy import select
 
 from app.deps import CurrentUser, DbSession
-from app.models import Routine
+from app.models import Exercise, Routine
 from app.schemas import OrmModel, RoutineOut
 from app.services.seed import import_initial
 from app.services.versions import (
@@ -14,6 +14,7 @@ from app.services.versions import (
     StaleRoutine,
     apply_day_edits,
     new_version,
+    restore_from,
     usable_exercises,
 )
 
@@ -81,6 +82,31 @@ def edit_routine(
         raise HTTPException(
             status.HTTP_409_CONFLICT, "La rutina cambió mientras la editabas: volvé a abrirla"
         ) from None
+    except ChangeError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from None
+    return RoutineOut.model_validate(routine)
+
+
+@router.post("/{routine_id}/restore", status_code=status.HTTP_201_CREATED)
+def restore_version(routine_id: uuid.UUID, user: CurrentUser, db: DbSession) -> RoutineOut:
+    """Volver a una versión (US-19): crea otra con su contenido; la historia queda entera."""
+    old = db.get(Routine, routine_id)
+    if old is None or old.user_id != user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No existe esa versión")
+    if old.status == "vigente":
+        raise HTTPException(status.HTTP_409_CONFLICT, "Esa ya es la versión vigente")
+    base = db.scalar(
+        select(Routine)
+        .where(Routine.user_id == user.id, Routine.status == "vigente")
+        .with_for_update()
+    )
+    if base is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Todavía no hay rutina")
+    names = {e.id: e.name for e in db.scalars(select(Exercise).where(Exercise.user_id == user.id))}
+    try:
+        routine = new_version(
+            db, base, "manual", restore_from(old, usable_exercises(db, user.id), names)
+        )
     except ChangeError as error:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from None
     return RoutineOut.model_validate(routine)
