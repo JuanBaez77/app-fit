@@ -10,6 +10,7 @@ import {
   routineWeek,
   sessionSeries,
   targetSets,
+  volumeSources,
   weekStart,
 } from './index'
 
@@ -178,5 +179,46 @@ describe('sessionSeries', () => {
     expect(first).toMatchObject({ sessionId: 's1', maxWeight: 80, volume: 1200 })
     expect(first!.e1rm).toBeCloseTo(101.33, 2)
     expect(second).toMatchObject({ sessionId: 's2', maxWeight: 82.5, volume: 495 })
+  })
+})
+
+describe('volumeSources', () => {
+  test('los ejercicios que aportaron a un músculo en la semana, con su factor', () => {
+    const exercises = new Map([
+      [
+        'banca',
+        {
+          muscles: [
+            { muscle_id: 'pectoral', factor: 1 },
+            { muscle_id: 'triceps', factor: 0.5 },
+          ],
+        },
+      ],
+      ['fondos', { muscles: [{ muscle_id: 'triceps', factor: 1 }] }],
+    ])
+    const sessions = new Map([
+      ['lunes', { date: '2026-10-19', deleted_at: null }],
+      ['jueves', { date: '2026-10-22', deleted_at: null }],
+      ['anterior', { date: '2026-10-16', deleted_at: null }],
+    ])
+    const row = (session_id: string, exercise_id: string, deleted = false) => ({
+      session_id,
+      exercise_id,
+      deleted_at: deleted ? '2026-10-22T12:00:00.000Z' : null,
+    })
+    const sets = [
+      row('lunes', 'banca'),
+      row('lunes', 'banca'),
+      row('jueves', 'banca'),
+      row('jueves', 'banca', true),
+      row('jueves', 'fondos'),
+      row('anterior', 'fondos'),
+    ]
+
+    expect(volumeSources(sets, sessions, exercises, '2026-10-19', 'triceps')).toEqual([
+      { exercise_id: 'banca', sets: 3, factor: 0.5 },
+      { exercise_id: 'fondos', sets: 1, factor: 1 },
+    ])
+    expect(volumeSources(sets, sessions, exercises, '2026-10-19', 'espalda')).toEqual([])
   })
 })

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import ExerciseProgress from '../components/ExerciseProgress'
+import MuscleVolume from '../components/MuscleVolume'
 
 const TABS = ['Ejercicio', 'Músculos', 'Peso corporal'] as const
 type Tab = (typeof TABS)[number]
@@ -28,7 +29,7 @@ export default function ProgressPage() {
       </div>
       <div role="tabpanel" aria-label={tab}>
         {tab === 'Ejercicio' && <ExerciseProgress />}
-        {tab === 'Músculos' && <p className="muted">Llega en PR-21.</p>}
+        {tab === 'Músculos' && <MuscleVolume />}
         {tab === 'Peso corporal' && <p className="muted">Llega en PR-22.</p>}
       </div>
     </main>

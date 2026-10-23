@@ -655,3 +655,94 @@ select {
   margin: 8px 0;
   padding-left: 20px;
 }
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.muscle-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.muscle-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.muscle-row[aria-expanded='true'] {
+  border-color: var(--accent);
+}
+
+.muscle-name::first-letter {
+  text-transform: uppercase;
+}
+
+.muscle-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  grid-column: 1 / -1;
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.bar-fill.met {
+  background: var(--ok);
+}
+
+.muscle-detail {
+  margin-top: 6px;
+}
+
+.muscle-detail h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.sources {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+
+.trend-weeks {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.trend-weeks li {
+  display: grid;
+  grid-template-columns: 6.5em 1fr 2.5em;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.trend-weeks .bar {
+  grid-column: auto;
+}
+
+.trend-weeks li > :last-child {
+  text-align: right;
+}

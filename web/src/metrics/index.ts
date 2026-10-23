@@ -178,6 +178,38 @@ export function weeklyVolume(
   return weeks
 }
 
+export interface VolumeSource {
+  exercise_id: string
+  sets: number
+  factor: number
+}
+
+/** Qué ejercicios aportaron series a un músculo en una semana, de mayor a menor aporte. */
+export function volumeSources(
+  sets: VolumeSet[],
+  sessions: Map<string, VolumeSession>,
+  exercises: Map<string, VolumeExercise>,
+  week: LocalDate,
+  muscleId: string,
+): VolumeSource[] {
+  const sources = new Map<string, VolumeSource>()
+  for (const set of sets) {
+    const session = sessions.get(set.session_id)
+    const exercise = exercises.get(set.exercise_id)
+    if (set.deleted_at || !session || session.deleted_at || !exercise) continue
+    if (weekStart(session.date) !== week) continue
+    const factor = exercise.muscles.find((m) => m.muscle_id === muscleId)?.factor
+    if (factor === undefined) continue
+    const current = sources.get(set.exercise_id) ?? {
+      exercise_id: set.exercise_id,
+      sets: 0,
+      factor,
+    }
+    sources.set(set.exercise_id, { ...current, sets: current.sets + 1 })
+  }
+  return [...sources.values()].sort((a, b) => b.sets * b.factor - a.sets * a.factor)
+}
+
 export interface SessionPoint {
   sessionId: string
   date: LocalDate
