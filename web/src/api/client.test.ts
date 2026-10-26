@@ -94,6 +94,23 @@ describe('request', () => {
     expect(expired).not.toHaveBeenCalled()
   })
 
+  test('el servidor caído detrás de Cloudflare (521, 524) tampoco cierra la sesión', async () => {
+    const expired = vi.fn()
+    setSessionExpiredHandler(expired)
+    mockFetch({
+      'POST /api/auth/refresh': () =>
+        new Response('<html>Web server is down</html>', {
+          status: 521,
+          headers: { 'Content-Type': 'text/html' },
+        }),
+      'POST /api/analyses': () => new Response('<html>A timeout occurred</html>', { status: 524 }),
+    })
+
+    await expect(refresh()).rejects.toBeInstanceOf(NetworkError)
+    await expect(request('/analyses', { method: 'POST' })).rejects.toBeInstanceOf(NetworkError)
+    expect(expired).not.toHaveBeenCalled()
+  })
+
   test('un 503 con JSON lo mandó la API: vale su motivo', async () => {
     mockFetch({
       'POST /api/analyses': () => json({ detail: 'Falta configurar ANTHROPIC_API_KEY' }, 503),

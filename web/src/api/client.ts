@@ -16,11 +16,12 @@ export class ApiError extends Error {
 export class NetworkError extends Error {}
 
 /**
- * Respuestas del proxy (nginx, o Vite en desarrollo) cuando la API no contesta. No dicen nada
- * de la sesión: tratarlas como un 401 cerraría la sesión y dejaría los datos locales sin abrir.
- * Si traen JSON las mandó la API con su motivo (un 503 de "falta configurar la key"), y valen.
+ * Respuestas del proxy (nginx, Cloudflare, o Vite en desarrollo) cuando la API no contesta. No
+ * dicen nada de la sesión: tratarlas como un 401 cerraría la sesión y dejaría los datos locales
+ * sin abrir. Si traen JSON las mandó la API con su motivo (un 503 de "falta configurar la key"),
+ * y valen. Los 52x y el 530 son de Cloudflare: el servidor caído, sin respuesta o a más de 100 s.
  */
-const GATEWAY_ERRORS = new Set([502, 503, 504])
+const GATEWAY_ERRORS = new Set([502, 503, 504, 520, 521, 522, 523, 524, 525, 526, 530])
 
 const fromGateway = (response: Response) =>
   GATEWAY_ERRORS.has(response.status) &&
