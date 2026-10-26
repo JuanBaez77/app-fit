@@ -1,12 +1,12 @@
 # Runbook
 
 Qué hacer cuando algo falla en producción, y cómo probar que los backups sirven. Los comandos
-corren en el VPS, dentro de `/opt/production/app-fit`, salvo que diga "en tu PC". Para no
+corren en el VPS, dentro de `/root/app-fit`, salvo que diga "en tu PC". Para no
 repetir `-f docker-compose.prod.yml`:
 
 ```bash
-ssh sv-gcg
-cd /opt/production/app-fit
+ssh vps-extend
+cd /root/app-fit
 alias dc='docker compose -f docker-compose.prod.yml'
 ```
 
@@ -14,7 +14,7 @@ alias dc='docker compose -f docker-compose.prod.yml'
 
 ```bash
 dc ps                                   # los cuatro servicios: db, api, web (nginx) y backup
-curl -s https://fit.tudominio.com/api/health
+curl -s https://fit.extendsystem.com/api/health
 dc logs --tail 100 api
 ```
 
@@ -44,7 +44,7 @@ En el celular, la consola del navegador muestra los mismos rechazos ("La API rec
 ## Análisis del brain
 
 - **"Falta configurar ANTHROPIC_API_KEY":** completá `ANTHROPIC_API_KEY` en `.env` y reiniciá la API con `dc up -d api`.
-- **"Falta subir el bundle":** en tu PC, corré `py brain/build_bundle.py` y después `make upload-bundle HOST=sv-gcg`.
+- **"Falta subir el bundle":** en tu PC, corré `py brain/build_bundle.py` y después `make upload-bundle HOST=vps-extend`.
 - **Un análisis falló:** queda guardado con el motivo; la pantalla lo muestra y se puede pedir otro. Para ver los últimos:
   ```bash
   dc exec db psql -U appfit -c "SELECT created_at, error FROM analysis WHERE status = 'fallido' ORDER BY created_at DESC LIMIT 5"
@@ -53,14 +53,14 @@ En el celular, la consola del navegador muestra los mismos rechazos ("La API rec
   ```bash
   dc exec db psql -U appfit -c "SELECT created_at::date, model, input_tokens, output_tokens, cache_read_tokens FROM analysis ORDER BY created_at DESC LIMIT 10"
   ```
-- **Tarda y se corta:** el proxy espera hasta 300 s (nginx del host, nginx del contenedor y gunicorn). Si se corta igual, el análisis puede haber terminado en el servidor; aparece al volver a abrir Análisis.
+- **Tarda y se corta:** el servidor espera hasta 300 s (nginx del host, nginx del contenedor y gunicorn), pero con el proxy de Cloudflare activo el pedido se corta a los 100 s. En los dos casos el análisis sigue en el servidor y aparece al volver a abrir Análisis. Para que no se corte, poné `fit` en "DNS only" en Cloudflare.
 
 ## Tiempo por serie
 
 La meta del MVP es una mediana de 5 s o menos. Desde tu PC:
 
 ```bash
-make interaction HOST=sv-gcg
+make interaction HOST=vps-extend
 ```
 
 Muestra una fila por semana con la mediana, el p90 y el % de series registradas en 5 s o menos.
@@ -70,7 +70,7 @@ Muestra una fila por semana con la mediana, el p90 y el % de series registradas 
 - El contenedor `backup` hace un `pg_dump` al arrancar y después cada 24 h, en `backups/appfit-AAAAMMDD-HHMMSS.dump`. Guarda 14 días.
 - Bajá copias a tu PC de vez en cuando; una copia en el mismo VPS no sirve si se pierde el VPS. En tu PC:
   ```bash
-  scp 'sv-gcg:/opt/production/app-fit/backups/*.dump' ./respaldos-app-fit/
+  scp 'vps-extend:/root/app-fit/backups/*.dump' ./respaldos-app-fit/
   ```
 
 ### Probar que un backup se restaura

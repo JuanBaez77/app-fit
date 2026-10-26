@@ -1,11 +1,11 @@
 #!/bin/sh
 # Despliega main en el VPS: baja los cambios, reconstruye y verifica el health.
-# Uso: sh scripts/deploy.sh <host-ssh>      (ej.: sh scripts/deploy.sh sv-gcg)
+# Uso: sh scripts/deploy.sh <host-ssh>      (ej.: sh scripts/deploy.sh vps-extend)
 # Requiere que el servidor ya esté preparado según docs/deploy.md.
 set -eu
 
 host="${1:?Uso: sh scripts/deploy.sh <host-ssh>}"
-dir="${DEPLOY_DIR:-/opt/production/app-fit}"
+dir="${DEPLOY_DIR:-/root/app-fit}"
 
 if [ -n "$(git status --porcelain)" ] || [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
   echo "Tu copia local no coincide con origin/main: se despliega lo que está en GitHub." >&2

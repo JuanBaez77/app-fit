@@ -31,7 +31,7 @@ Es la prueba de cierre de S3. Se hace en tu celular, con la app desplegada (HTTP
 9. [ ] Desactivá el modo avión con la app abierta. En unos segundos el aviso de arriba desaparece: se subió todo.
 10. [ ] Desde la PC, mirá que estén en el servidor y que no haya duplicados (la cantidad tiene que coincidir con lo que registraste):
     ```bash
-    ssh sv-gcg "cd /opt/production/app-fit && docker compose -f docker-compose.prod.yml exec -T db \
+    ssh vps-extend "cd /root/app-fit && docker compose -f docker-compose.prod.yml exec -T db \
       psql -U appfit -d appfit -c \"select set_number, weight_kg, reps, rir, deleted_at is not null as borrada \
       from set_log order by logged_at desc limit 20\""
     ```
