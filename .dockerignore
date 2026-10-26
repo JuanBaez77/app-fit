@@ -1,4 +1,4 @@
-# Contexto de la imagen web (nginx/Dockerfile): solo hace falta web/ y nginx/
+# Contexto de la imagen web (nginx/Dockerfile): solo hace falta web/, nginx/ y fixtures/
 **/node_modules
 **/dist
 **/coverage
