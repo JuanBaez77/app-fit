@@ -30,15 +30,15 @@ dev-user: ## Crea el usuario de desarrollo de .env.example en la base local
 migrate: ## Aplica las migraciones (la api también las aplica al arrancar)
 	$(API_DB) alembic upgrade head
 
-deploy: ## Despliega main en el VPS: make deploy HOST=sv-gcg (ver docs/deploy.md)
+deploy: ## Despliega main en el VPS: make deploy HOST=vps-extend (ver docs/deploy.md)
 	sh scripts/deploy.sh $(HOST)
 
-upload-bundle: ## Registra brain/out/latest.json en la base local, o en el VPS con HOST=sv-gcg
+upload-bundle: ## Registra brain/out/latest.json en la base local, o en el VPS con HOST=vps-extend
 	sh scripts/upload-bundle.sh $(HOST)
 
-interaction: ## Mediana semanal del tiempo por serie (meta: 5 s); en el VPS con HOST=sv-gcg
+interaction: ## Mediana semanal del tiempo por serie (meta: 5 s); en el VPS con HOST=vps-extend
 	@if [ -n "$(HOST)" ]; then \
-	  ssh $(HOST) "cd $${DEPLOY_DIR:-/opt/production/app-fit} && docker compose -f docker-compose.prod.yml exec -T api python -m app.cli interaction"; \
+	  ssh $(HOST) "cd $${DEPLOY_DIR:-/root/app-fit} && docker compose -f docker-compose.prod.yml exec -T api python -m app.cli interaction"; \
 	else $(API_DB) python -m app.cli interaction; fi
 
 restore-test: ## Prueba que un backup se restaura: sin argumentos, con un dump nuevo; o DUMP=archivo

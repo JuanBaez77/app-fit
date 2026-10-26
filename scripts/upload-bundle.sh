@@ -22,7 +22,7 @@ if [ -z "${1:-}" ]; then
 fi
 
 host="$1"
-dir="${DEPLOY_DIR:-/opt/production/app-fit}"
+dir="${DEPLOY_DIR:-/root/app-fit}"
 ssh "$host" mkdir -p "$dir/brain-out"
 # shellcheck disable=SC2086
 (cd brain/out && scp latest.json $files "$host:$dir/brain-out/")
