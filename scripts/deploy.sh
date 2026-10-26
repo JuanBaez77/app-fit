@@ -15,7 +15,11 @@ ssh "$host" sh -s -- "$dir" <<'REMOTE'
 set -eu
 cd "$1"
 git pull --ff-only
-docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+# Las imágenes base son públicas: se bajan sin los logins guardados en el servidor, que pueden
+# no servir para ese registro (uno de ghcr.io de otro proyecto respondía "denied" con la de uv)
+anon=$(mktemp -d)
+trap 'rm -rf "$anon"' EXIT
+DOCKER_CONFIG=$anon docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
 port=$(grep -E '^APP_PORT=' .env | cut -d= -f2)
 for i in 1 2 3 4 5 6 7 8 9 10; do
   if curl -fsS "http://127.0.0.1:${port:-8020}/api/health"; then

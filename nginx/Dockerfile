@@ -5,6 +5,8 @@ WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web/ ./
+# tsc -b también revisa los tests, y el de métricas importa los fixtures compartidos con la API
+COPY fixtures/ /fixtures/
 RUN npm run build
 
 FROM nginx:1.28-alpine
