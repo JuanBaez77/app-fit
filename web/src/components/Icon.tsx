@@ -33,6 +33,20 @@ const PATHS = {
       <path d="M12 7v5l3 2" />
     </>
   ),
+  // Los de la barra de pestañas
+  flame: (
+    <path d="M12 12c2-2.96 0-7-1-8 0 3.04-1.77 4.74-3 6-1.23 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.53-1.06-3.94-2-5-1.79 3-2.79 3-4 2z" />
+  ),
+  calendar: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+      <path d="M8 3v4M16 3v4M3.5 10.5h17" />
+    </>
+  ),
+  chart: <path d="M4 4v16h16M8 15l3.5-3.5 3 2.5L20 8.5" />,
+  sparkles: (
+    <path d="M16 18a2 2 0 0 1 2 2 2 2 0 0 1 2-2 2 2 0 0 1-2-2 2 2 0 0 1-2 2zm0-12a2 2 0 0 1 2 2 2 2 0 0 1 2-2 2 2 0 0 1-2-2 2 2 0 0 1-2 2zM9 18a6 6 0 0 1 6-6 6 6 0 0 1-6-6 6 6 0 0 1-6 6 6 6 0 0 1 6 6z" />
+  ),
 } satisfies Record<string, ReactNode>
 
 export type IconName = keyof typeof PATHS

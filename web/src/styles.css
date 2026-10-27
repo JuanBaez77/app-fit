@@ -327,21 +327,29 @@ button.grouped-row:active:not(:disabled) {
   z-index: 5;
 }
 
+/* Como en iOS: el ícono arriba y la etiqueta chica abajo */
 .tabbar a {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   min-height: calc(var(--tabbar-height) - 12px);
   border-radius: 999px;
   color: var(--muted);
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   font-weight: 600;
+  transition: color 120ms ease-out;
 }
 
 .tabbar a.active {
   color: var(--accent);
   background: var(--surface-3);
+}
+
+.tabbar a.active .icon {
+  stroke-width: 2.4;
 }
 
 /* Login */
