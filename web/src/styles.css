@@ -1,19 +1,31 @@
-/* Base visual: contraste alto (pantalla a pleno sol) y áreas táctiles de 48 px o más. */
+/*
+ * Base visual oscura, al estilo de las apps de entrenamiento de iOS: fondo negro, tarjetas grises,
+ * números grandes y acentos fuertes. Contraste alto y áreas táctiles de 48 px o más.
+ */
 :root {
-  --bg: #ffffff;
-  --surface: #f1f3f6;
-  --text: #0b0d10;
-  --muted: #4a525e;
-  --border: #c9ced6;
-  --accent: #0a4fd9;
-  --accent-text: #ffffff;
-  --danger: #b3261e;
-  --ok: #0f7b3a;
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+  --surface-3: #3a3a3c;
+  --text: #ffffff;
+  --muted: #8e8e93;
+  --border: #38383a;
+  /* La acción principal */
+  --accent: #b4f03c;
+  --accent-text: #000000;
+  /* Para destacar datos: los botones de la serie, los días entrenados */
+  --hot: #ff375f;
+  --violet: #a78bfa;
+  --danger: #ff453a;
+  --ok: #30d158;
   --touch: 48px;
-  --radius: 12px;
+  --radius: 16px;
+  --radius-control: 12px;
   --tabbar-height: 64px;
+  /* En iPhone es SF Pro Rounded; en el resto, la fuente del sistema */
+  --font-numbers: ui-rounded, system-ui, sans-serif;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   font-family:
     system-ui,
     -apple-system,
@@ -25,20 +37,7 @@
   color: var(--text);
   background: var(--bg);
   -webkit-text-size-adjust: 100%;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d0f12;
-    --surface: #1a1e24;
-    --text: #f5f7fa;
-    --muted: #b4bcc8;
-    --border: #3a414c;
-    --accent: #5b9dff;
-    --accent-text: #0b0d10;
-    --danger: #ff8a80;
-    --ok: #6ee39a;
-  }
+  -webkit-font-smoothing: antialiased;
 }
 
 *,
@@ -53,9 +52,17 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Título grande de iOS (34 px) */
 h1 {
-  font-size: 1.5rem;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   margin: 0;
+}
+
+a {
+  color: var(--accent);
 }
 
 button,
@@ -69,23 +76,29 @@ textarea {
 button {
   min-height: var(--touch);
   min-width: var(--touch);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border-radius: var(--radius-control);
+  border: 2px solid transparent;
+  background: var(--surface-2);
   padding: 0 16px;
+  font-weight: 600;
   cursor: pointer;
   touch-action: manipulation;
+  transition: transform 80ms ease-out;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
 }
 
 button.primary {
   background: var(--accent);
-  border-color: var(--accent);
   color: var(--accent-text);
-  font-weight: 600;
+  font-weight: 700;
+  border-radius: 999px;
 }
 
 button.link {
@@ -99,9 +112,14 @@ input {
   min-height: var(--touch);
   width: 100%;
   padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg);
+  border: 2px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+}
+
+input:focus {
+  border-color: var(--accent);
+  outline: none;
 }
 
 :focus-visible {
@@ -121,17 +139,17 @@ input {
 .notice {
   background: var(--surface);
   border-left: 4px solid var(--accent);
-  padding: 12px;
-  border-radius: 4px;
+  padding: 12px 16px;
+  border-radius: var(--radius-control);
 }
 
-/* Layout con barra inferior fija */
+/* Layout con la barra de pestañas flotando abajo */
 .layout {
   min-height: 100dvh;
 }
 
 .content {
-  padding: 16px 16px calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 16px);
+  padding: 16px 16px calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 32px);
 }
 
 .page-header {
@@ -139,34 +157,42 @@ input {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 16px;
+  margin: 8px 0 20px;
 }
 
 .tabbar {
   position: fixed;
-  inset: auto 0 0 0;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(calc(100% - 32px), 420px);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  min-height: var(--tabbar-height);
-  padding-bottom: env(safe-area-inset-bottom);
-  background: var(--bg);
-  border-top: 1px solid var(--border);
+  gap: 4px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgb(44 44 46 / 85%);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 60%);
+  z-index: 5;
 }
 
 .tabbar a {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--tabbar-height);
+  min-height: calc(var(--tabbar-height) - 12px);
+  border-radius: 999px;
   color: var(--muted);
   text-decoration: none;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .tabbar a.active {
   color: var(--accent);
-  font-weight: 700;
-  box-shadow: inset 0 3px 0 var(--accent);
+  background: var(--surface-3);
 }
 
 /* Login */
@@ -207,7 +233,9 @@ input {
 }
 
 h2 {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 4px 0;
 }
 
@@ -226,6 +254,7 @@ button.big {
   width: 100%;
   min-height: 56px;
   font-size: 1.1rem;
+  border-radius: 999px;
 }
 
 .day-list {
@@ -287,6 +316,7 @@ button.big {
 
 .history dd {
   margin: 0;
+  font-family: var(--font-numbers);
   font-variant-numeric: tabular-nums;
 }
 
@@ -311,7 +341,8 @@ button.big {
 }
 
 button.set-row {
-  background: var(--bg);
+  background: var(--surface-2);
+  font-weight: 500;
 }
 
 button.set-row[aria-pressed='true'] {
@@ -350,11 +381,12 @@ button.set-row[aria-pressed='true'] {
 .exercise-nav button {
   white-space: nowrap;
   flex: none;
+  border-radius: 999px;
 }
 
 .exercise-nav button[aria-current='true'] {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--text);
+  color: var(--bg);
   font-weight: 700;
 }
 
@@ -367,15 +399,28 @@ button.set-row[aria-pressed='true'] {
   padding-bottom: 0;
 }
 
+/* En la sesión, el título va chico: deja lugar al ejercicio */
+.session .page-header {
+  margin: 0 0 12px;
+}
+
+.session h1 {
+  flex: 1;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
 .set-panel {
   position: sticky;
   bottom: 0;
   margin: 16px -16px 0;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: var(--bg);
-  border-top: 2px solid var(--border);
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 24px rgb(0 0 0 / 60%);
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .set-panel-title {
@@ -392,14 +437,17 @@ button.set-row[aria-pressed='true'] {
 }
 
 .stepper-label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
 .stepper > button,
 .stepper > input {
   min-height: 56px;
+  font-family: var(--font-numbers);
   font-size: 1.4rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -407,8 +455,20 @@ button.set-row[aria-pressed='true'] {
   user-select: none;
 }
 
-.stepper-value {
-  background: var(--bg);
+/* Los botones redondos de − y +, con el número grande en el medio */
+.stepper > button:not(.stepper-value) {
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--hot);
+  color: #000000;
+  font-size: 1.8rem;
+}
+
+.stepper .stepper-value {
+  padding: 0;
+  background: transparent;
+  font-size: 2rem;
 }
 
 .rir-hint {
@@ -425,10 +485,11 @@ button.set-row[aria-pressed='true'] {
 
 .rir-chip {
   min-height: 64px;
-  font-size: 1.5rem;
-  font-weight: 700;
+  border-radius: var(--radius);
+  font-family: var(--font-numbers);
+  font-size: 1.6rem;
+  font-weight: 800;
   background: var(--accent);
-  border-color: var(--accent);
   color: var(--accent-text);
 }
 
@@ -450,17 +511,17 @@ button.danger {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 16px;
-  border-radius: var(--radius);
-  background: var(--text);
-  color: var(--bg);
+  padding: 8px 8px 8px 20px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 60%);
   z-index: 10;
 }
 
 .toast .link {
-  color: var(--bg);
+  color: var(--accent);
   font-weight: 700;
-  text-decoration: underline;
 }
 
 .picker {
@@ -524,25 +585,39 @@ button.danger {
   padding: 0;
   display: grid;
   place-items: center;
+  border-radius: 14px;
+  font-family: var(--font-numbers);
   font-variant-numeric: tabular-nums;
-  background: var(--bg);
+  background: var(--surface);
   line-height: 1.1;
 }
 
-.calendar .day.today {
-  border-color: var(--accent);
+/* Entrenado: el día se tiñe con el color de los datos */
+.calendar .day.done {
+  background: rgb(255 55 95 / 28%);
   font-weight: 700;
 }
 
+.calendar .day.today {
+  color: var(--accent);
+  font-weight: 800;
+}
+
 .calendar .day[aria-pressed='true'] {
-  background: var(--surface);
-  border-width: 2px;
+  border-color: var(--text);
 }
 
 .calendar .mark {
-  font-size: 0.75rem;
-  color: var(--accent);
+  font-size: 0.6rem;
   min-height: 1em;
+}
+
+.calendar .day.done .mark {
+  color: var(--hot);
+}
+
+.calendar .day.missed .mark {
+  color: var(--muted);
 }
 
 .legend {
@@ -562,7 +637,8 @@ button.danger {
 
 .stats dd {
   margin: 0;
-  font-weight: 600;
+  font-family: var(--font-numbers);
+  font-weight: 700;
   text-align: right;
 }
 
@@ -584,24 +660,31 @@ button.danger {
   flex: 1;
 }
 
-/* Progreso */
+/* Progreso. El control segmentado de iOS: una pista gris y la opción elegida más clara */
 .segmented {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   margin: 12px 0;
+  padding: 3px;
+  border-radius: var(--radius-control);
+  background: var(--surface);
   overflow-x: auto;
 }
 
 .segmented button {
   flex: 1;
+  padding: 0 8px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.85rem;
   white-space: nowrap;
 }
 
 .segmented button[aria-selected='true'],
 .segmented button[aria-pressed='true'] {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text);
+  background: var(--surface-3);
+  color: var(--text);
   font-weight: 700;
 }
 
@@ -612,13 +695,17 @@ button.danger {
 }
 
 select {
+  /* Sin esto se estira hasta la opción más larga y se sale de la pantalla */
+  min-width: 0;
+  max-width: 100%;
   min-height: var(--touch);
   padding: 0 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg);
+  border: 2px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
   color: var(--text);
   font: inherit;
+  font-weight: 600;
 }
 
 .chart-title {
@@ -688,7 +775,9 @@ select {
 }
 
 .muscle-count {
+  font-family: var(--font-numbers);
   font-variant-numeric: tabular-nums;
+  font-weight: 700;
 }
 
 .bar {
@@ -703,7 +792,8 @@ select {
 .bar-fill {
   display: block;
   height: 100%;
-  background: var(--accent);
+  border-radius: 4px;
+  background: var(--violet);
 }
 
 .bar-fill.met {
@@ -795,13 +885,15 @@ select {
   display: grid;
   gap: 12px;
   margin: 0;
-  padding: 12px;
-  border: 1px solid var(--border);
+  padding: 16px;
+  border: 0;
   border-radius: var(--radius);
+  background: var(--surface);
 }
 
 .settings legend {
-  padding: 0 4px;
+  float: left;
+  padding: 0;
   font-weight: 700;
 }
 
@@ -813,9 +905,9 @@ select {
 
 .settings textarea {
   padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg);
+  border: 2px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
 }
 
 .checks {
@@ -841,12 +933,18 @@ select {
   width: 22px;
   min-height: 22px;
   height: 22px;
+  accent-color: var(--accent);
 }
 
 /* Rutina y editor */
 .header-links {
   display: flex;
   gap: 16px;
+}
+
+.header-links a {
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .routine-day-header,
