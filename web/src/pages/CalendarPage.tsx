@@ -103,7 +103,7 @@ export default function CalendarPage() {
                   <td key={j}>
                     <button
                       type="button"
-                      className={`day${date === today ? ' today' : ''}`}
+                      className={`day${date === today ? ' today' : ''}${done ? ' done' : missed ? ' missed' : ''}`}
                       aria-label={label}
                       aria-pressed={date === selected}
                       onClick={() => setSelected(date)}
