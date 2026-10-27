@@ -22,15 +22,29 @@ export function useProfile(): Profile | null | undefined {
   return useLiveQuery(async () => (await db.profile.get('me')) ?? null, [])
 }
 
-/** Sesiones no borradas de un día, la más reciente primero. */
-export function useSessionsOn(date: LocalDate): Session[] | undefined {
-  return useLiveQuery(
-    async () =>
-      (await db.sessions.where('date').equals(date).toArray())
-        .filter((s) => !s.deleted_at)
-        .sort((a, b) => (b.started_at ?? '').localeCompare(a.started_at ?? '')),
-    [date],
-  )
+export interface SessionsWithSets {
+  /** La más reciente primero */
+  sessions: Session[]
+  setsBySession: Map<string, number>
+}
+
+/** Sesiones no borradas entre dos días (incluidos) y cuántas series tiene cada una. */
+export function useSessionsBetween(from: LocalDate, to: LocalDate): SessionsWithSets | undefined {
+  return useLiveQuery(async () => {
+    const sessions = (await db.sessions.where('date').between(from, to, true, true).toArray())
+      .filter((s) => !s.deleted_at)
+      .sort((a, b) => (b.started_at ?? '').localeCompare(a.started_at ?? ''))
+    const setsBySession = new Map<string, number>()
+    const sets = await db.set_logs
+      .where('session_id')
+      .anyOf(sessions.map((s) => s.id))
+      .toArray()
+    for (const set of sets) {
+      if (!set.deleted_at)
+        setsBySession.set(set.session_id, (setsBySession.get(set.session_id) ?? 0) + 1)
+    }
+    return { sessions, setsBySession }
+  }, [from, to])
 }
 
 export function useSession(id: string | undefined): Session | null | undefined {

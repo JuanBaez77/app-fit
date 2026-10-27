@@ -18,6 +18,14 @@
   --violet: #a78bfa;
   --danger: #ff453a;
   --ok: #30d158;
+  --accent-tint: rgb(180 240 60 / 16%);
+  --ok-tint: rgb(48 209 88 / 18%);
+  /* Escala de texto de iOS (la base es 17 px): título grande 34, título 22 y 20, subtítulo 15,
+     nota al pie 13 */
+  --fs-title2: 1.3rem;
+  --fs-title3: 1.18rem;
+  --fs-subhead: 0.88rem;
+  --fs-footnote: 0.765rem;
   --touch: 48px;
   --radius: 16px;
   --radius-control: 12px;
@@ -101,11 +109,56 @@ button.primary {
   border-radius: 999px;
 }
 
+/* Teñido: la acción secundaria, con el color de acento sobre un fondo suave */
+button.tinted {
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+
 button.link {
   background: none;
   border: none;
   color: var(--accent);
   padding: 0 8px;
+}
+
+/* Un botón con ícono y texto */
+button.big,
+button.tinted,
+button.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Botón redondo con solo un ícono: el círculo se ve de 36 px y el área táctil es de 48 */
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  color: var(--accent);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.icon-button > span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  transition: opacity 80ms ease-out;
+}
+
+.icon-button:active > span {
+  opacity: 0.6;
+}
+
+.icon {
+  flex: none;
+  display: block;
 }
 
 input {
@@ -129,6 +182,102 @@ input:focus {
 
 .muted {
   color: var(--muted);
+}
+
+.subhead {
+  font-size: var(--fs-subhead);
+}
+
+/* Solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.footnote {
+  font-size: var(--fs-footnote);
+}
+
+/* Etiqueta chica en forma de píldora */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-size: var(--fs-footnote);
+  font-weight: 600;
+}
+
+.badge-ok {
+  background: var(--ok-tint);
+  color: var(--ok);
+}
+
+/* Título de sección, como los de Fitness */
+.section-title {
+  font-size: var(--fs-title3);
+  margin: 28px 4px 10px;
+}
+
+/* Lista agrupada de iOS: filas en un bloque redondeado, con separadores corridos a la derecha */
+.grouped {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.grouped-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  text-align: left;
+  font-weight: 400;
+  transition: background-color 80ms ease-out;
+}
+
+.grouped > li + li .grouped-row {
+  background-image: linear-gradient(var(--border), var(--border));
+  background-size: calc(100% - 16px) 0.5px;
+  background-position: right top;
+  background-repeat: no-repeat;
+}
+
+/* Al tocar, la fila se ilumina en vez de achicarse */
+button.grouped-row:active:not(:disabled) {
+  transform: none;
+  background-color: var(--surface-2);
+}
+
+.grouped-row-text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+/* El gris terciario de iOS */
+.grouped-row .chevron {
+  color: rgb(235 235 245 / 30%);
+}
+
+.list-footer {
+  margin: 8px 16px 0;
 }
 
 .error {
@@ -178,21 +327,29 @@ input:focus {
   z-index: 5;
 }
 
+/* Como en iOS: el ícono arriba y la etiqueta chica abajo */
 .tabbar a {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   min-height: calc(var(--tabbar-height) - 12px);
   border-radius: 999px;
   color: var(--muted);
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   font-weight: 600;
+  transition: color 120ms ease-out;
 }
 
 .tabbar a.active {
   color: var(--accent);
   background: var(--surface-3);
+}
+
+.tabbar a.active .icon {
+  stroke-width: 2.4;
 }
 
 /* Login */
@@ -257,17 +414,280 @@ button.big {
   border-radius: 999px;
 }
 
-.day-list {
-  display: grid;
-  gap: 8px;
+/* Hoy. La fecha chica arriba del título grande, como en el App Store */
+.page-header.large {
+  align-items: flex-end;
+  margin-bottom: 16px;
 }
 
-.day-list button {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: left;
+.eyebrow {
+  margin: 0 0 2px;
+  color: var(--muted);
+  font-size: var(--fs-footnote);
   font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.header-actions {
+  display: flex;
+  margin-right: -6px;
+}
+
+/* La semana: el círculo se llena el día entrenado y lleva un anillo hoy */
+.week-strip {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+
+.week-strip li {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-size: var(--fs-footnote);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.week-day {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-family: var(--font-numbers);
+  font-size: var(--fs-subhead);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.week-strip .rest .week-day {
+  background: transparent;
+  color: var(--muted);
+}
+
+.week-strip .missed .week-day {
+  color: var(--muted);
+}
+
+.week-strip .trained .week-day {
+  background: var(--hot);
+  color: #000000;
+  font-weight: 700;
+}
+
+.week-strip .today .week-day {
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 4px var(--accent);
+}
+
+.week-strip .today {
+  color: var(--accent);
+}
+
+/* Tarjeta con su contenido apilado con aire parejo */
+.card.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.card.stack > * + * {
+  margin-top: 0;
+}
+
+.card.stack h2,
+.card.stack p {
+  margin: 0;
+}
+
+/* La tarjeta del día */
+.day-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.day-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.day-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: var(--muted);
+  font-size: var(--fs-subhead);
+}
+
+.day-stats li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Los ejercicios del día, en un bloque más claro dentro de la tarjeta */
+.preview {
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  font-size: var(--fs-subhead);
+}
+
+.preview ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.preview li,
+.preview-more {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 14px;
+}
+
+.preview li + li {
+  border-top: 0.5px solid var(--border);
+}
+
+.preview-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-sets {
+  flex: none;
+  color: var(--muted);
+  font-family: var(--font-numbers);
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-more {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-top: 0.5px solid var(--border);
+  border-radius: 0 0 var(--radius-control) var(--radius-control);
+  background: transparent;
+  color: var(--accent);
+  font-size: var(--fs-subhead);
+}
+
+button.preview-more:active:not(:disabled) {
+  transform: none;
+  background: var(--surface-3);
+}
+
+.preview-more .icon {
+  transition: transform 150ms ease-out;
+}
+
+.preview-more[aria-expanded='true'] .icon {
+  transform: rotate(-90deg);
+}
+
+/* Sesión en curso: un punto verde que late */
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ok);
+  font-size: var(--fs-footnote);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.progress {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--ok);
+  transition: width 300ms ease-out;
+}
+
+/* Descanso y primer uso: ícono en un círculo, centrado */
+.rest-card,
+.empty-state {
+  justify-items: center;
+  text-align: center;
+}
+
+.empty-state {
+  display: grid;
+  gap: 12px;
+  padding: 32px 8px 0;
+}
+
+.empty-state h2 {
+  margin: 4px 0 0;
+}
+
+.empty-state button {
+  margin-top: 12px;
+}
+
+.symbol {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--violet);
+}
+
+.empty-state .symbol {
+  color: var(--accent);
+}
+
+.rest-card p,
+.empty-state p {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
 }
 
 .back {
@@ -937,16 +1357,6 @@ select {
 }
 
 /* Rutina y editor */
-.header-links {
-  display: flex;
-  gap: 16px;
-}
-
-.header-links a {
-  font-weight: 600;
-  text-decoration: none;
-}
-
 .routine-day-header,
 .editor-item-header {
   display: flex;

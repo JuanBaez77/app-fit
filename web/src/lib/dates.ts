@@ -25,6 +25,22 @@ export function weekdayName(weekday: number): string {
   return WEEKDAYS[weekday - 1] ?? ''
 }
 
+/** "lunes 26 de octubre" */
+export function longDate(date: Date = new Date()): string {
+  return date
+    .toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
+    .replace(',', '')
+}
+
+/** "18:05" */
+export function timeOfDay(iso: string): string {
+  return new Date(iso).toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  })
+}
+
 /** "lun 19 oct" */
 export function shortDate(value: LocalDate): string {
   return parseLocalDate(value)

@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router'
+import Icon, { type IconName } from './Icon'
 
-const TABS = [
-  { to: '/', label: 'Hoy' },
-  { to: '/calendario', label: 'Calendario' },
-  { to: '/progreso', label: 'Progreso' },
-  { to: '/analisis', label: 'Análisis' },
+const TABS: { to: string; label: string; icon: IconName }[] = [
+  { to: '/', label: 'Hoy', icon: 'flame' },
+  { to: '/calendario', label: 'Calendario', icon: 'calendar' },
+  { to: '/progreso', label: 'Progreso', icon: 'chart' },
+  { to: '/analisis', label: 'Análisis', icon: 'sparkles' },
 ]
 
 export default function TabBar() {
@@ -12,7 +13,8 @@ export default function TabBar() {
     <nav className="tabbar" aria-label="Secciones">
       {TABS.map((tab) => (
         <NavLink key={tab.to} to={tab.to} end={tab.to === '/'}>
-          {tab.label}
+          <Icon name={tab.icon} size={22} />
+          <span>{tab.label}</span>
         </NavLink>
       ))}
     </nav>
