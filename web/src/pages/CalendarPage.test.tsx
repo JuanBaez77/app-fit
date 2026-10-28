@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -68,7 +68,18 @@ test('marca los días entrenados y los planificados que no se hicieron', async (
   expect(
     screen.getByRole('button', { name: /mié 21 oct: entrenado, Pierna A/ }),
   ).toBeInTheDocument()
-  expect(screen.getByText('2 de 2 sesiones')).toBeInTheDocument()
+  expect(screen.getByText('Sesiones esta semana').nextElementSibling).toHaveTextContent('2 de 2')
+})
+
+test('de entrada muestra el día de hoy, y un día sin sesión dice qué tocaba', async () => {
+  renderCalendar()
+
+  expect(await screen.findByRole('heading', { name: 'jueves 22 de octubre' })).toBeInTheDocument()
+  expect(screen.getByText('Día de descanso.')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'jue 22 oct' })).toHaveAttribute('aria-pressed', 'true')
+
+  await userEvent.click(screen.getByRole('button', { name: /mar 20 oct/ }))
+  expect(screen.getByText('Tocaba Pierna A. No hay sesión registrada.')).toBeInTheDocument()
 })
 
 test('tocar un día muestra su sesión y deja cambiarle la fecha', async () => {
@@ -77,7 +88,12 @@ test('tocar un día muestra su sesión y deja cambiarle la fecha', async () => {
   await userEvent.click(await screen.findByRole('button', { name: /lun 19 oct/ }))
   expect(await screen.findByText('1 ejercicio · 2 series')).toBeInTheDocument()
 
-  await userEvent.click(screen.getByRole('button', { name: 'Cambiar la fecha' }))
+  // Cancelar deja la fecha como estaba
+  await userEvent.click(screen.getByRole('button', { name: /Cambiar la fecha/ }))
+  await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+  expect(screen.queryByLabelText('Fecha')).not.toBeInTheDocument()
+
+  await userEvent.click(screen.getByRole('button', { name: /Cambiar la fecha/ }))
   const input = screen.getByLabelText('Fecha')
   await userEvent.clear(input)
   await userEvent.type(input, '2026-10-20')
@@ -87,12 +103,32 @@ test('tocar un día muestra su sesión y deja cambiarle la fecha', async () => {
   expect(await db.outbox.get('sessions:s1')).toBeDefined()
 })
 
-test('navega entre meses', async () => {
+test('navega entre meses, y Hoy vuelve al mes en curso', async () => {
   renderCalendar()
 
   await userEvent.click(await screen.findByRole('button', { name: 'Mes siguiente' }))
+  expect(screen.getByRole('heading', { name: 'noviembre 2026' })).toBeInTheDocument()
 
-  expect(screen.getByText(/nov/)).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Hoy' }))
+  expect(screen.getByRole('heading', { name: 'octubre 2026' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Hoy' })).not.toBeInTheDocument()
+})
+
+test('deslizar de costado cambia de mes; deslizar en vertical, no', async () => {
+  renderCalendar()
+  const grid = await screen.findByRole('table')
+
+  fireEvent.pointerDown(grid, { clientX: 300, clientY: 100 })
+  fireEvent.pointerUp(grid, { clientX: 200, clientY: 110 })
+  expect(screen.getByRole('heading', { name: 'noviembre 2026' })).toBeInTheDocument()
+
+  fireEvent.pointerDown(grid, { clientX: 200, clientY: 100 })
+  fireEvent.pointerUp(grid, { clientX: 260, clientY: 300 })
+  expect(screen.getByRole('heading', { name: 'noviembre 2026' })).toBeInTheDocument()
+
+  fireEvent.pointerDown(grid, { clientX: 100, clientY: 100 })
+  fireEvent.pointerUp(grid, { clientX: 200, clientY: 100 })
+  expect(screen.getByRole('heading', { name: 'octubre 2026' })).toBeInTheDocument()
 })
 
 test('después de editar la rutina, las sesiones viejas conservan el nombre de su día', async () => {
