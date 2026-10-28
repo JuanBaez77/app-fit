@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { db } from '../db/db'
@@ -23,12 +23,14 @@ beforeEach(async () => {
 
 async function type(value: string) {
   const field = await screen.findByLabelText('Peso de hoy (kg)')
+  await userEvent.clear(field)
   await userEvent.type(field, value)
 }
 
-test('carga el peso de hoy y queda en la cola para sincronizar', async () => {
+test('anota el peso de hoy y queda en la cola para sincronizar', async () => {
   render(<BodyWeightPanel />)
 
+  await userEvent.click(await screen.findByRole('button', { name: 'Anotar el peso de hoy' }))
   await type('80,6')
   await userEvent.click(screen.getByRole('button', { name: 'Guardar' }))
 
@@ -38,16 +40,23 @@ test('carga el peso de hoy y queda en la cola para sincronizar', async () => {
   expect(await db.outbox.get(`body_weights:${saved[0]!.id}`)).toBeDefined()
 
   // (81 + 80,6) / 2 = 80,8 contra 82,5 de la semana anterior
-  expect(screen.getAllByRole('definition').map((d) => d.textContent)).toEqual(['80,8 kg', '-2,1 %'])
+  expect(await screen.findByText('80,8')).toBeInTheDocument()
+  expect(screen.getByText('-2,1 % contra la anterior')).toBeInTheDocument()
+  expect(
+    screen.getByRole('button', { name: 'Cambiar el peso de hoy (80,6 kg)' }),
+  ).toBeInTheDocument()
 })
 
-test('si hoy ya tiene peso, lo reemplaza en la misma fila', async () => {
+test('si hoy ya tiene peso, se edita en la misma fila', async () => {
   await db.body_weights.put(weight('hoy', '2026-10-22', 81.5))
   render(<BodyWeightPanel />)
 
-  expect(await screen.findByText('Hoy ya cargaste 81,5 kg.')).toBeInTheDocument()
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Cambiar el peso de hoy (81,5 kg)' }),
+  )
+  expect(screen.getByLabelText('Peso de hoy (kg)')).toHaveValue('81,5')
   await type('81')
-  await userEvent.click(screen.getByRole('button', { name: 'Reemplazar' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Guardar' }))
 
   await screen.findByRole('status')
   expect(await db.body_weights.where('date').equals('2026-10-22').toArray()).toMatchObject([
@@ -55,19 +64,45 @@ test('si hoy ya tiene peso, lo reemplaza en la misma fila', async () => {
   ])
 })
 
+test('Cancelar no guarda nada', async () => {
+  render(<BodyWeightPanel />)
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Anotar el peso de hoy' }))
+  await type('79')
+  await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+  expect(screen.queryByLabelText('Peso de hoy (kg)')).not.toBeInTheDocument()
+  expect(await db.body_weights.count()).toBe(3)
+})
+
 test('el promedio por semana con su variación', async () => {
   render(<BodyWeightPanel />)
 
-  const rows = (await screen.findAllByRole('row')).slice(1).map((r) => r.textContent)
-  expect(rows).toEqual(['lun 19 oct81 kg (1 pesaje)-1,8 %', 'lun 12 oct82,5 kg (2 pesajes)—'])
+  const list = await screen.findByRole('list', { name: 'Promedio por semana' })
+  expect(
+    within(list)
+      .getAllByRole('listitem')
+      .map((r) => r.textContent),
+  ).toEqual(['Esta semana1 pesaje81 kg-1,8 %', '12–18 oct2 pesajes82,5 kg—'])
+  expect(screen.getByText('Promedio de esta semana')).toBeInTheDocument()
+  expect(screen.getByText('-1,8 % contra la anterior')).toBeInTheDocument()
 })
 
 test('un peso que no es un número no se guarda', async () => {
   render(<BodyWeightPanel />)
 
+  await userEvent.click(await screen.findByRole('button', { name: 'Anotar el peso de hoy' }))
   await type('ochenta')
   await userEvent.click(screen.getByRole('button', { name: 'Guardar' }))
 
   expect(screen.getByRole('alert')).toHaveTextContent('Escribí el peso en kg')
   expect(await db.body_weights.count()).toBe(3)
+})
+
+test('sin pesos, invita a anotar el primero', async () => {
+  await db.body_weights.clear()
+  render(<BodyWeightPanel />)
+
+  expect(await screen.findByText('Todavía no hay pesos cargados.')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Anotar el peso de hoy' })).toBeInTheDocument()
 })

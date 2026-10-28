@@ -1,7 +1,8 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useRef, useState, type PointerEvent } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router'
 import Icon from '../components/Icon'
+import Ring from '../components/Ring'
 import {
   byDate,
   missedPlanned,
@@ -25,11 +26,9 @@ import {
   shortDate,
 } from '../lib/dates'
 import { decimal } from '../lib/format'
+import { useSwipe } from '../lib/swipe'
 
 const WEEKDAY_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
-
-/** Lo que hay que arrastrar de costado para cambiar de mes */
-const SWIPE_PX = 50
 
 function plural(n: number, one: string, many: string) {
   return `${n} ${n === 1 ? one : many}`
@@ -44,7 +43,8 @@ export default function CalendarPage() {
   // De qué lado entra el mes nuevo, para la animación
   const [direction, setDirection] = useState<'next' | 'prev' | null>(null)
   const [selected, setSelected] = useState<LocalDate | null>(null)
-  const swipeStart = useRef<{ x: number; y: number } | null>(null)
+  // Deslizar de costado cambia de mes; lo vertical sigue siendo scroll
+  const swipe = useSwipe((direction) => move(direction))
   const routine = useCurrentRoutine()
   const data = useLiveQuery(async () => {
     const sessions = (await db.sessions.toArray()).filter((s) => !s.deleted_at)
@@ -88,16 +88,6 @@ export default function CalendarPage() {
     setSelected(null)
   }
 
-  // Deslizar de costado cambia de mes; lo vertical sigue siendo scroll (touch-action: pan-y)
-  function endSwipe(e: PointerEvent) {
-    const start = swipeStart.current
-    swipeStart.current = null
-    if (!start) return
-    const dx = e.clientX - start.x
-    const dy = e.clientY - start.y
-    if (Math.abs(dx) >= SWIPE_PX && Math.abs(dx) > 1.5 * Math.abs(dy)) move(dx < 0 ? 1 : -1)
-  }
-
   return (
     <main>
       <header className="page-header">
@@ -121,12 +111,7 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      <table
-        className="calendar"
-        onPointerDown={(e) => (swipeStart.current = { x: e.clientX, y: e.clientY })}
-        onPointerUp={endSwipe}
-        onPointerCancel={() => (swipeStart.current = null)}
-      >
+      <table className="calendar" {...swipe}>
         <thead>
           <tr>
             {WEEKDAY_HEADERS.map((d) => (
@@ -335,27 +320,5 @@ function Summary({ stats }: { stats: WeekStats }) {
         </div>
       </dl>
     </section>
-  )
-}
-
-/** El anillo de la semana, como los de Fitness: se cierra al hacer todas las sesiones. */
-function Ring({ value, max }: { value: number; max: number }) {
-  const r = 13
-  const length = 2 * Math.PI * r
-  const filled = max > 0 ? Math.min(1, value / max) * length : 0
-  return (
-    <svg className="stat-ring" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-      <circle className="track" cx="16" cy="16" r={r} />
-      {filled > 0 && (
-        <circle
-          className="fill"
-          cx="16"
-          cy="16"
-          r={r}
-          strokeDasharray={`${filled} ${length}`}
-          transform="rotate(-90 16 16)"
-        />
-      )}
-    </svg>
   )
 }
