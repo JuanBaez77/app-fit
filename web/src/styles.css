@@ -16,6 +16,8 @@
   /* Para destacar datos: los botones de la serie, los días entrenados */
   --hot: #ff375f;
   --violet: #a78bfa;
+  /* El celeste de Salud, para el peso corporal */
+  --blue: #64d2ff;
   --danger: #ff453a;
   --ok: #30d158;
   --accent-tint: rgb(180 240 60 / 16%);
@@ -1269,24 +1271,6 @@ button.day:active:not(:disabled) {
   font-size: 0.85rem;
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 6px 12px;
-  margin: 16px 0;
-}
-
-.stats dt {
-  color: var(--muted);
-}
-
-.stats dd {
-  margin: 0;
-  font-family: var(--font-numbers);
-  font-weight: 700;
-  text-align: right;
-}
-
 /* Progreso. El control segmentado de iOS: una pista gris y la opción elegida más clara */
 .segmented {
   display: flex;
@@ -1315,10 +1299,22 @@ button.day:active:not(:disabled) {
   font-weight: 700;
 }
 
-.field {
-  display: grid;
-  gap: 6px;
-  font-weight: 500;
+/* El chico, dentro de una tarjeta: como el de días, semanas y meses de Salud */
+.segmented.compact {
+  margin: 0 0 14px;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--surface-2);
+}
+
+.segmented.compact button {
+  min-height: 32px;
+  border-radius: 7px;
+  font-size: var(--fs-footnote);
+}
+
+.segmented.compact button[aria-pressed='true'] {
+  background: #636366;
 }
 
 select {
@@ -1335,54 +1331,205 @@ select {
   font-weight: 600;
 }
 
-.chart-title {
-  font-size: 1rem;
-  margin-top: 12px;
+/* Un selector que se ve como una fila, con el ícono de los menús de iOS. El select sigue siendo
+   el nativo: en el iPhone abre la rueda */
+.select-row {
+  position: relative;
+  display: block;
+  margin-bottom: 12px;
 }
 
-.chart {
+.select-row select {
+  appearance: none;
   width: 100%;
-  height: 220px;
+  min-height: 52px;
+  padding: 0 44px 0 16px;
+  border: 0;
+  background: var(--surface);
+  text-overflow: ellipsis;
 }
 
-.session-history {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  gap: 6px;
+.select-row-icon {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
 }
 
-.session-history button {
-  display: grid;
-  grid-template-columns: 5.5em 1fr 1.5em;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
-  font-variant-numeric: tabular-nums;
+/* La métrica, arriba del número: un menú que se lee como un rótulo */
+.metric-select {
+  position: relative;
+  display: inline-flex;
 }
 
-.session-history button[aria-pressed='true'] {
-  border-color: var(--accent);
-}
-
-.detail-sets {
-  margin: 8px 0;
-  padding-left: 20px;
-}
-
-.week-nav {
-  display: flex;
+.metric-select-text {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
+  min-height: 32px;
+  color: var(--muted);
+  font-size: var(--fs-subhead);
   font-weight: 600;
 }
 
-.muscle-list {
+.metric-select select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 0;
+  opacity: 0;
+}
+
+.metric-select:has(select:focus-visible) .metric-select-text {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.metric-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-subhead);
+  font-weight: 600;
+}
+
+/* El número grande, como en Salud: el valor, la unidad chica y una línea de contexto */
+.chart-card > * + * {
+  margin-top: 0;
+}
+
+.headline {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+}
+
+.headline-value {
+  font-family: var(--font-numbers);
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.headline-unit {
+  color: var(--muted);
+  font-size: var(--fs-subhead);
+  font-weight: 600;
+}
+
+.headline-note {
+  min-height: 1.4em;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: var(--fs-subhead);
+}
+
+.headline-note.up {
+  color: var(--ok);
+}
+
+.headline-note.down {
+  color: var(--danger);
+}
+
+.trend-chart {
+  height: 180px;
+  margin-top: 12px;
+  touch-action: pan-y;
+}
+
+/* Recharts deja el gráfico enfocado al tocarlo: el marco solo con teclado */
+.trend-chart :focus:not(:focus-visible) {
+  outline: none;
+}
+
+.chart-empty {
+  margin: 16px 0 4px;
+}
+
+.chart-card > .footnote {
+  margin-top: 10px;
+}
+
+/* La flecha de una fila que se abre en el lugar: gira hacia abajo */
+.disclosure {
+  transition: transform 150ms ease-out;
+}
+
+[aria-expanded='true'] > .disclosure {
+  transform: rotate(90deg);
+}
+
+/* Lo que se abre debajo de una fila de una lista agrupada */
+.row-detail {
+  padding: 0 16px 14px;
+}
+
+.row-detail > p {
+  margin: 10px 0 0;
+}
+
+.set-lines {
   list-style: none;
+  margin: 0;
   padding: 0;
   display: grid;
-  gap: 6px;
+  gap: 4px;
+  font-size: var(--fs-subhead);
+  font-variant-numeric: tabular-nums;
+}
+
+.set-lines li {
+  display: grid;
+  grid-template-columns: 5em 1fr auto;
+  gap: 8px;
+}
+
+/* Músculos */
+.swipe-area {
+  touch-action: pan-y;
+}
+
+.week-body.from-next {
+  animation: month-from-next 200ms ease-out;
+}
+
+.week-body.from-prev {
+  animation: month-from-prev 200ms ease-out;
+}
+
+.volume-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 0;
+  padding: 12px 16px;
+}
+
+.volume-summary .stat-ring {
+  margin: 0;
+}
+
+.volume-summary p {
+  display: grid;
+  margin: 0;
+}
+
+.volume-summary strong {
+  font-family: var(--font-numbers);
+  font-size: var(--fs-title3);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.muscle-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .muscle-row {
@@ -1391,10 +1538,6 @@ select {
   gap: 6px 8px;
   width: 100%;
   text-align: left;
-}
-
-.muscle-row[aria-expanded='true'] {
-  border-color: var(--accent);
 }
 
 .muscle-name::first-letter {
@@ -1407,6 +1550,10 @@ select {
   font-weight: 700;
 }
 
+.muscle-count .muted {
+  font-weight: 400;
+}
+
 .bar {
   grid-column: 1 / -1;
   display: block;
@@ -1414,6 +1561,12 @@ select {
   border-radius: 4px;
   background: var(--surface);
   overflow: hidden;
+}
+
+.muscle-item .bar {
+  height: 4px;
+  margin-top: 6px;
+  background: var(--surface-3);
 }
 
 .bar-fill {
@@ -1427,78 +1580,149 @@ select {
   background: var(--ok);
 }
 
-.muscle-detail {
-  margin-top: 6px;
+.mini-stats {
+  display: flex;
+  gap: 28px;
+  margin: 0;
 }
 
-.muscle-detail h3 {
-  font-size: 0.95rem;
-  margin-bottom: 0;
+.mini-stats div {
+  display: grid;
 }
 
-.sources {
-  margin: 4px 0;
-  padding-left: 20px;
+.mini-stats dt {
+  order: 2;
+  color: var(--muted);
+  font-size: var(--fs-footnote);
 }
 
-.trend-weeks {
+.mini-stats dd {
+  order: 1;
+  margin: 0;
+  font-family: var(--font-numbers);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-title {
+  margin: 14px 0 6px;
+  color: var(--muted);
+  font-size: var(--fs-footnote);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.source-lines {
   list-style: none;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: 4px;
+  font-size: var(--fs-subhead);
 }
 
-.trend-weeks li {
-  display: grid;
-  grid-template-columns: 6.5em 1fr 2.5em;
-  align-items: center;
-  gap: 8px;
-  font-variant-numeric: tabular-nums;
-}
-
-.trend-weeks .bar {
-  grid-column: auto;
-}
-
-.trend-weeks li > :last-child {
-  text-align: right;
-}
-
-.weight-form {
+.source-lines li {
   display: flex;
-  gap: 8px;
-  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.weight-form label {
+.source-lines li > :last-child {
+  flex: none;
+}
+
+/* Las últimas semanas en barras, con la meta punteada */
+.week-bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  gap: 4px;
-  flex: 1;
-  font-weight: 500;
-}
-
-.weight-weeks {
-  width: 100%;
-  border-collapse: collapse;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
   font-variant-numeric: tabular-nums;
 }
 
-.weight-weeks th {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--muted);
-  text-align: left;
+.week-bars li {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
 }
 
-.weight-weeks td,
-.weight-weeks th {
-  padding: 6px 4px;
-  border-bottom: 1px solid var(--border);
+.week-bar-value {
+  font-size: var(--fs-footnote);
+  font-weight: 600;
 }
 
-.weight-weeks td:last-child,
-.weight-weeks th:last-child {
+.week-bar {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 28px;
+  height: 64px;
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+
+.week-bar-fill {
+  width: 100%;
+  border-radius: 6px;
+  background: var(--violet);
+}
+
+.week-bar-fill.met {
+  background: var(--ok);
+}
+
+.week-goal {
+  position: absolute;
+  right: -4px;
+  left: -4px;
+  border-top: 1.5px dashed var(--muted);
+}
+
+.week-bars li:last-child .footnote {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Peso */
+.today-weight {
+  margin-bottom: 8px;
+}
+
+.today-weight input {
+  width: 6.5em;
+  font-family: var(--font-numbers);
   text-align: right;
+}
+
+.add-row {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.row-value {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.weights-empty {
+  margin-top: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .week-body.from-next,
+  .week-body.from-prev {
+    animation: none;
+  }
+
+  .disclosure {
+    transition: none;
+  }
 }
 
 /* Ajustes */

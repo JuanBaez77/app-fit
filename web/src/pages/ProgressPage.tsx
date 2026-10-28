@@ -3,7 +3,8 @@ import BodyWeightPanel from '../components/BodyWeightPanel'
 import ExerciseProgress from '../components/ExerciseProgress'
 import MuscleVolume from '../components/MuscleVolume'
 
-const TABS = ['Ejercicio', 'Músculos', 'Peso corporal'] as const
+// "Peso" a secas: "Peso corporal" no entra en el control a lo ancho del celular
+const TABS = ['Ejercicio', 'Músculos', 'Peso'] as const
 type Tab = (typeof TABS)[number]
 
 /** Progreso: un gráfico por ejercicio, el volumen por músculo y el peso corporal. */
@@ -31,7 +32,7 @@ export default function ProgressPage() {
       <div role="tabpanel" aria-label={tab}>
         {tab === 'Ejercicio' && <ExerciseProgress />}
         {tab === 'Músculos' && <MuscleVolume />}
-        {tab === 'Peso corporal' && <BodyWeightPanel />}
+        {tab === 'Peso' && <BodyWeightPanel />}
       </div>
     </main>
   )
