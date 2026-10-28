@@ -9,6 +9,7 @@ const PATHS = {
     />
   ),
   chevron: <path d="M9 5.5l6.5 6.5L9 18.5" />,
+  chevronLeft: <path d="M15 5.5L8.5 12l6.5 6.5" />,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   list: (
     <>

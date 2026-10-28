@@ -41,6 +41,24 @@ export function timeOfDay(iso: string): string {
   })
 }
 
+/** "19 oct 2026" */
+export function mediumDate(value: LocalDate): string {
+  return (
+    parseLocalDate(value)
+      .toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })
+      .replace(/\./g, '')
+      // Algunos navegadores dan "27 de oct de 2026"
+      .replace(/ de /g, ' ')
+  )
+}
+
+/** "octubre 2026" */
+export function monthTitle(year: number, month: number): string {
+  return new Date(year, month, 1)
+    .toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
+    .replace(' de ', ' ')
+}
+
 /** "lun 19 oct" */
 export function shortDate(value: LocalDate): string {
   return parseLocalDate(value)
