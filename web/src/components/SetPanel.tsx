@@ -65,9 +65,14 @@ export default function SetPanel({
     >
       <div className="set-panel-title">
         <strong>{title}</strong>
-        {onCancel && (
+        {/* Arriba a la derecha, como las acciones de iOS: no ocupa una fila propia */}
+        {onCancel ? (
           <button type="button" className="link" onClick={onCancel}>
             Cancelar
+          </button>
+        ) : (
+          <button type="button" className="link" disabled={saving} onClick={() => void save(null)}>
+            Guardar sin RIR
           </button>
         )}
       </div>
@@ -90,7 +95,7 @@ export default function SetPanel({
         decimals={false}
         onChange={setReps}
       />
-      <p className="rir-hint">¿Cuántas te quedaban? Tocá = guarda</p>
+      <p className="rir-hint">¿Cuántas te quedaban? Tocá y se guarda</p>
       <div className="rir-chips" role="group" aria-label="RIR">
         {RIR_CHIPS.map((chip) => (
           <button
@@ -105,16 +110,19 @@ export default function SetPanel({
           </button>
         ))}
       </div>
-      <div className="set-panel-actions">
-        <button type="button" disabled={saving} onClick={() => void save(null)}>
-          Guardar sin RIR
-        </button>
-        {onDelete && (
-          <button type="button" className="danger" onClick={onDelete}>
-            Borrar serie
+      {/* Al editar, abajo van guardar sin RIR y borrar */}
+      {onCancel && (
+        <div className="set-panel-actions">
+          <button type="button" className="link" disabled={saving} onClick={() => void save(null)}>
+            Guardar sin RIR
           </button>
-        )}
-      </div>
+          {onDelete && (
+            <button type="button" className="link danger" onClick={onDelete}>
+              Borrar serie
+            </button>
+          )}
+        </div>
+      )}
     </section>
   )
 }

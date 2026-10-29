@@ -31,10 +31,15 @@ export function restText(minSec: number | null, maxSec: number | null): string |
 
 /** "3 × 6–10 · RIR 1–2 · desc. 2–3 min" */
 export function prescription(item: RoutineDayExercise, sets: number): string {
+  return prescriptionParts(item, sets).join(' · ')
+}
+
+/** ["3 × 6–10", "RIR 1–2", "desc. 2–3 min"]: lo mismo, en partes sueltas */
+export function prescriptionParts(item: RoutineDayExercise, sets: number): string[] {
   const parts = [`${sets} × ${range(item.reps_min, item.reps_max)}`]
   const rir = range(item.rir_min, item.rir_max)
   if (rir) parts.push(`RIR ${rir}`)
   const rest = restText(item.rest_min_sec, item.rest_max_sec)
   if (rest) parts.push(`desc. ${rest}`)
-  return parts.join(' · ')
+  return parts
 }

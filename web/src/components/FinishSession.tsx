@@ -7,11 +7,17 @@ function parseHours(text: string): number | null | 'invalid' {
   return Number.isFinite(value) && value >= 0 && value <= 24 ? value : 'invalid'
 }
 
-/** Cierre de la sesión: horas de sueño y molestias, cada una en un campo y opcionales. */
+/**
+ * Cierre de la sesión, en una hoja: el resumen y dos filas opcionales, horas de sueño y
+ * molestias, como un formulario de Ajustes de iOS.
+ */
 export default function FinishSession({
+  summary,
   onFinish,
   onCancel,
 }: {
+  /** "4 ejercicios · 14 series · 52 min" */
+  summary: string
   onFinish: (close: SessionClose) => Promise<unknown>
   onCancel: () => void
 }) {
@@ -31,38 +37,49 @@ export default function FinishSession({
 
   return (
     <form className="finish" aria-label="Terminar la sesión" onSubmit={(e) => void submit(e)}>
-      <label>
-        Horas de sueño anoche (opcional)
-        <input
-          inputMode="decimal"
-          placeholder="7,5"
-          value={hours}
-          onChange={(e) => setHours(e.target.value)}
-        />
-      </label>
-      <label>
-        Molestias (opcional)
-        <input
-          placeholder="Ej.: hombro derecho al bajar en el press"
-          maxLength={2000}
-          value={discomfort}
-          onChange={(e) => setDiscomfort(e.target.value)}
-        />
-        <small className="muted">Solo viajan al análisis del brain si lo activás en Ajustes.</small>
-      </label>
+      <p className="finish-summary">{summary}</p>
+      <ul className="grouped">
+        <li>
+          <label className="form-row">
+            Horas de sueño anoche
+            <input
+              inputMode="decimal"
+              placeholder="7,5"
+              value={hours}
+              onChange={(e) => {
+                setHours(e.target.value)
+                setError(null)
+              }}
+            />
+          </label>
+        </li>
+        <li>
+          <label className="form-row stacked">
+            Molestias
+            <input
+              placeholder="Ej.: hombro derecho al bajar en el press"
+              maxLength={2000}
+              value={discomfort}
+              onChange={(e) => setDiscomfort(e.target.value)}
+            />
+          </label>
+        </li>
+      </ul>
+      <p className="list-footer footnote muted">
+        Las dos son opcionales. Las molestias solo viajan al análisis del brain si lo activás en
+        Ajustes.
+      </p>
       {error && (
-        <p role="alert" className="error">
+        <p role="alert" className="error list-footer">
           {error}
         </p>
       )}
-      <div className="finish-actions">
-        <button type="button" onClick={onCancel}>
-          Seguir entrenando
-        </button>
-        <button type="submit" className="primary">
-          Terminar sesión
-        </button>
-      </div>
+      <button type="submit" className="primary big">
+        Terminar sesión
+      </button>
+      <button type="button" className="link finish-cancel" onClick={onCancel}>
+        Seguir entrenando
+      </button>
     </form>
   )
 }
