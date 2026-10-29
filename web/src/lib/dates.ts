@@ -41,6 +41,43 @@ export function timeOfDay(iso: string): string {
   })
 }
 
+/** "19 oct 2026" */
+export function mediumDate(value: LocalDate): string {
+  return (
+    parseLocalDate(value)
+      .toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })
+      .replace(/\./g, '')
+      // Algunos navegadores dan "27 de oct de 2026"
+      .replace(/ de /g, ' ')
+  )
+}
+
+/** "octubre 2026" */
+export function monthTitle(year: number, month: number): string {
+  return new Date(year, month, 1)
+    .toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
+    .replace(' de ', ' ')
+}
+
+/** "26 oct" */
+export function dayMonth(value: LocalDate): string {
+  return parseLocalDate(value)
+    .toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
+    .replace(/\./g, '')
+    .replace(' de ', ' ')
+}
+
+/** "19–25 oct", o "28 sept – 4 oct" si la semana cruza de mes. Recibe el lunes. */
+export function weekRange(monday: LocalDate): string {
+  const start = parseLocalDate(monday)
+  const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6)
+  const month = (date: Date) =>
+    date.toLocaleDateString('es-AR', { month: 'short' }).replace(/\./g, '')
+  return start.getMonth() === end.getMonth()
+    ? `${start.getDate()}–${end.getDate()} ${month(end)}`
+    : `${start.getDate()} ${month(start)} – ${end.getDate()} ${month(end)}`
+}
+
 /** "lun 19 oct" */
 export function shortDate(value: LocalDate): string {
   return parseLocalDate(value)

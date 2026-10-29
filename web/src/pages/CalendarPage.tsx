@@ -1,6 +1,8 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { Link } from 'react-router'
+import Icon from '../components/Icon'
+import Ring from '../components/Ring'
 import {
   byDate,
   missedPlanned,
@@ -8,13 +10,23 @@ import {
   plannedWeekdays,
   trainedSessions,
   weekStats,
+  type WeekStats,
 } from '../data/calendar'
 import { useCurrentRoutine } from '../data/hooks'
 import { db } from '../db/db'
-import type { LocalDate, Session } from '../db/types'
+import type { LocalDate, Routine, Session } from '../db/types'
 import { saveRow } from '../db/write'
-import { localDate, parseLocalDate, shortDate } from '../lib/dates'
+import {
+  isoWeekday,
+  localDate,
+  longDate,
+  mediumDate,
+  monthTitle,
+  parseLocalDate,
+  shortDate,
+} from '../lib/dates'
 import { decimal } from '../lib/format'
+import { useSwipe } from '../lib/swipe'
 
 const WEEKDAY_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 
@@ -28,7 +40,11 @@ export default function CalendarPage() {
     const now = new Date()
     return { year: now.getFullYear(), month: now.getMonth() }
   })
+  // De qué lado entra el mes nuevo, para la animación
+  const [direction, setDirection] = useState<'next' | 'prev' | null>(null)
   const [selected, setSelected] = useState<LocalDate | null>(null)
+  // Deslizar de costado cambia de mes; lo vertical sigue siendo scroll
+  const swipe = useSwipe((direction) => move(direction))
   const routine = useCurrentRoutine()
   const data = useLiveQuery(async () => {
     const sessions = (await db.sessions.toArray()).filter((s) => !s.deleted_at)
@@ -52,14 +68,23 @@ export default function CalendarPage() {
   const days = data.dayNames
   const stats = weekStats(trained, plannedWeekdays(routine).size, today)
   const grid = monthGrid(month.year, month.month)
-  const title = new Date(month.year, month.month, 1).toLocaleDateString('es-AR', {
-    month: 'short',
-    year: 'numeric',
-  })
+  const now = parseLocalDate(today)
+  const isCurrentMonth = month.year === now.getFullYear() && month.month === now.getMonth()
+  // Sin elegir, el detalle es el de hoy
+  const shown = selected ?? today
 
   function move(delta: number) {
     const date = new Date(month.year, month.month + delta, 1)
     setMonth({ year: date.getFullYear(), month: date.getMonth() })
+    setDirection(delta > 0 ? 'next' : 'prev')
+    setSelected(null)
+  }
+
+  function goToday() {
+    setDirection(
+      month.year * 12 + month.month > now.getFullYear() * 12 + now.getMonth() ? 'prev' : 'next',
+    )
+    setMonth({ year: now.getFullYear(), month: now.getMonth() })
     setSelected(null)
   }
 
@@ -67,18 +92,26 @@ export default function CalendarPage() {
     <main>
       <header className="page-header">
         <h1>Calendario</h1>
-        <div className="month-nav">
-          <button type="button" aria-label="Mes anterior" onClick={() => move(-1)}>
-            ‹
-          </button>
-          <span>{title.replace('.', '')}</span>
-          <button type="button" aria-label="Mes siguiente" onClick={() => move(1)}>
-            ›
-          </button>
-        </div>
       </header>
 
-      <table className="calendar">
+      <div className="month-header">
+        <h2 aria-live="polite">{monthTitle(month.year, month.month)}</h2>
+        <div className="month-nav">
+          {!isCurrentMonth && (
+            <button type="button" className="link" onClick={goToday}>
+              Hoy
+            </button>
+          )}
+          <button type="button" className="link" aria-label="Mes anterior" onClick={() => move(-1)}>
+            <Icon name="chevronLeft" size={22} />
+          </button>
+          <button type="button" className="link" aria-label="Mes siguiente" onClick={() => move(1)}>
+            <Icon name="chevron" size={22} />
+          </button>
+        </div>
+      </div>
+
+      <table className="calendar" {...swipe}>
         <thead>
           <tr>
             {WEEKDAY_HEADERS.map((d) => (
@@ -88,7 +121,10 @@ export default function CalendarPage() {
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody
+          key={`${month.year}-${month.month}`}
+          className={direction ? `from-${direction}` : undefined}
+        >
           {grid.map((week, i) => (
             <tr key={i}>
               {week.map((date, j) => {
@@ -105,13 +141,10 @@ export default function CalendarPage() {
                       type="button"
                       className={`day${date === today ? ' today' : ''}${done ? ' done' : missed ? ' missed' : ''}`}
                       aria-label={label}
-                      aria-pressed={date === selected}
+                      aria-pressed={date === shown}
                       onClick={() => setSelected(date)}
                     >
-                      {parseLocalDate(date).getDate()}
-                      <span className="mark" aria-hidden="true">
-                        {done ? '●' : missed ? '○' : ''}
-                      </span>
+                      <span className="day-number">{parseLocalDate(date).getDate()}</span>
                     </button>
                   </td>
                 )
@@ -120,57 +153,70 @@ export default function CalendarPage() {
           ))}
         </tbody>
       </table>
-      <p className="muted legend">● entrenado · ○ planificado y no hecho</p>
+      <p className="calendar-legend footnote muted">
+        <span className="done">Entrenado</span>
+        <span className="missed">Planificado y no hecho</span>
+      </p>
 
-      <dl className="stats">
-        <dt>Esta semana</dt>
-        <dd>
-          {stats.thisWeek.done} de {plural(stats.thisWeek.planned, 'sesión', 'sesiones')}
-        </dd>
-        <dt>Racha</dt>
-        <dd>{plural(stats.streak, 'semana al día', 'semanas al día')}</dd>
-        <dt>Últimas 3 semanas</dt>
-        <dd>{decimal(stats.averageLast3)} sesiones/sem</dd>
-      </dl>
+      <DayDetail
+        date={shown}
+        today={today}
+        routine={routine}
+        sessions={trainedByDate.get(shown) ?? []}
+        setsBySession={data.setsBySession}
+        dayNames={days}
+      />
 
-      {selected && (
-        <DaySummary
-          date={selected}
-          sessions={trainedByDate.get(selected) ?? []}
-          setsBySession={data.setsBySession}
-          dayNames={days}
-        />
-      )}
+      <Summary stats={stats} />
     </main>
   )
 }
 
-function DaySummary({
+function DayDetail({
   date,
+  today,
+  routine,
   sessions,
   setsBySession,
   dayNames,
 }: {
   date: LocalDate
+  today: LocalDate
+  routine: Routine | null
   sessions: Session[]
   setsBySession: Map<string, number>
   dayNames: Map<string, string>
 }) {
-  if (sessions.length === 0) {
-    return <p className="card muted">{shortDate(date)}: sin sesión registrada.</p>
-  }
   return (
-    <>
-      {sessions.map((session) => (
-        <SessionSummary
-          key={session.id}
-          session={session}
-          name={dayNames.get(session.routine_day_id ?? '') ?? 'Sesión'}
-          sets={setsBySession.get(session.id) ?? 0}
-        />
-      ))}
-    </>
+    <section className="day-detail" aria-labelledby="day-detail-title">
+      <h2 id="day-detail-title" className="group-header">
+        {longDate(parseLocalDate(date))}
+      </h2>
+      {sessions.length === 0 ? (
+        <p className="grouped-empty">{emptyText(date, today, routine)}</p>
+      ) : (
+        sessions.map((session) => (
+          <SessionSummary
+            key={session.id}
+            session={session}
+            name={dayNames.get(session.routine_day_id ?? '') ?? 'Sesión'}
+            sets={setsBySession.get(session.id) ?? 0}
+          />
+        ))
+      )}
+    </section>
   )
+}
+
+/** Qué tocaba un día sin sesión, según la rutina vigente. */
+function emptyText(date: LocalDate, today: LocalDate, routine: Routine | null): string {
+  const inRoutine = routine && (!routine.start_on || date >= routine.start_on)
+  const planned = inRoutine
+    ? routine.days.find((d) => d.weekday === isoWeekday(parseLocalDate(date)))
+    : undefined
+  if (!planned) return date >= today ? 'Día de descanso.' : 'Sin sesión registrada.'
+  if (date < today) return `Tocaba ${planned.name}. No hay sesión registrada.`
+  return date === today ? `Hoy toca ${planned.name}.` : `Toca ${planned.name}.`
 }
 
 function SessionSummary({ session, name, sets }: { session: Session; name: string; sets: number }) {
@@ -186,35 +232,93 @@ function SessionSummary({ session, name, sets }: { session: Session; name: strin
     [session.id],
   )
 
+  function cancel() {
+    setDate(session.date)
+    setEditing(false)
+  }
+
   return (
-    <section className="card" aria-label={`Sesión ${name}`}>
-      <Link to={`/sesion/${session.id}`} className="session-link">
-        {shortDate(session.date)} · {name} ›
-      </Link>
-      <p className="muted">
-        {plural(exercises ?? 0, 'ejercicio', 'ejercicios')} · {plural(sets, 'serie', 'series')}
-      </p>
-      {editing ? (
-        <form
-          className="date-form"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (date) void saveRow('sessions', { ...session, date }).then(() => setEditing(false))
-          }}
-        >
-          <label>
-            Fecha
-            <input type="date" value={date} required onChange={(e) => setDate(e.target.value)} />
-          </label>
-          <button type="submit" className="primary">
-            Guardar
+    <ul className="grouped" aria-label={`Sesión ${name}`}>
+      <li>
+        <Link to={`/sesion/${session.id}`} className="grouped-row">
+          <span className="grouped-row-text">
+            <span>{name}</span>
+            <span className="muted subhead">
+              {plural(exercises ?? 0, 'ejercicio', 'ejercicios')} ·{' '}
+              {plural(sets, 'serie', 'series')}
+            </span>
+          </span>
+          <Icon name="chevron" size={18} className="chevron" />
+        </Link>
+      </li>
+      <li>
+        {editing ? (
+          <form
+            className="date-edit"
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (date) void saveRow('sessions', { ...session, date }).then(() => setEditing(false))
+            }}
+          >
+            <label>
+              Fecha
+              <input type="date" value={date} required onChange={(e) => setDate(e.target.value)} />
+            </label>
+            <div className="date-edit-actions">
+              <button type="button" className="link" onClick={cancel}>
+                Cancelar
+              </button>
+              <button type="submit" className="primary">
+                Guardar
+              </button>
+            </div>
+          </form>
+        ) : (
+          <button
+            type="button"
+            className="grouped-row"
+            aria-label={`Cambiar la fecha (${mediumDate(session.date)})`}
+            onClick={() => setEditing(true)}
+          >
+            <span className="grouped-row-text">Fecha</span>
+            <span className="value-pill">{mediumDate(session.date)}</span>
           </button>
-        </form>
-      ) : (
-        <button type="button" className="link" onClick={() => setEditing(true)}>
-          Cambiar la fecha
-        </button>
-      )}
+        )}
+      </li>
+    </ul>
+  )
+}
+
+function Summary({ stats }: { stats: WeekStats }) {
+  const { done, planned } = stats.thisWeek
+  return (
+    <section aria-labelledby="summary-title">
+      <h2 id="summary-title" className="section-title">
+        Resumen
+      </h2>
+      <dl className="stat-tiles">
+        <div className="stat-tile">
+          <Ring value={done} max={planned} />
+          <dt>Sesiones esta semana</dt>
+          <dd>
+            {done} de {planned}
+          </dd>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-flame">
+            <Icon name="flame" size={30} />
+          </span>
+          <dt>{stats.streak === 1 ? 'Semana al día seguida' : 'Semanas al día seguidas'}</dt>
+          <dd>{stats.streak}</dd>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-trend">
+            <Icon name="chart" size={30} />
+          </span>
+          <dt>Sesiones por semana, últimas 3</dt>
+          <dd>{decimal(stats.averageLast3)}</dd>
+        </div>
+      </dl>
     </section>
   )
 }

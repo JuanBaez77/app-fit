@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { db } from '../db/db'
@@ -81,50 +81,94 @@ beforeEach(async () => {
   ])
 })
 
-const rows = async () =>
-  within(await screen.findByRole('list', { name: 'Músculos' }))
-    .getAllByRole('button')
-    .map((b) => b.textContent)
+/** Cada grupo de la lista con sus filas */
+async function groups() {
+  await screen.findByRole('list', { name: 'Prioridad alta' })
+  return Object.fromEntries(
+    screen
+      .getAllByRole('list')
+      .filter((list) => list.classList.contains('grouped'))
+      .map((list) => [
+        list.getAttribute('aria-labelledby'),
+        within(list)
+          .getAllByRole('button')
+          .map((b) => b.textContent),
+      ]),
+  )
+}
 
-test('series fraccionales de la semana contra la tabla de la rutina', async () => {
+test('series fraccionales de la semana contra la tabla de la rutina, por prioridad', async () => {
   render(<MuscleVolume />)
 
-  // Primero los de la tabla, en su orden; después los que tuvieron series sin meta
-  expect(await rows()).toEqual(['Pectoral3 de 12', 'Tríceps1,5 de 10,5', 'biceps1', 'espalda2'])
-  expect(screen.getByText('Esta semana')).toBeInTheDocument()
+  // Los de la tabla, en su orden y agrupados; al final los que tuvieron series sin meta
+  expect(await groups()).toEqual({
+    'muscles-alta': ['Pectoral3 de 12'],
+    'muscles-otros': ['Tríceps1,5 de 10,5'],
+    'muscles-sin-meta': ['biceps1', 'espalda2'],
+  })
+  expect(screen.getByRole('heading', { name: 'Esta semana' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Semana siguiente' })).toBeDisabled()
+  expect(screen.getByText('0 de 2')).toBeInTheDocument()
 })
 
-test('la semana anterior', async () => {
+test('la semana anterior, y Esta semana para volver', async () => {
   render(<MuscleVolume />)
-  await rows()
+  await groups()
 
   await userEvent.click(screen.getByRole('button', { name: 'Semana anterior' }))
 
-  expect(screen.getByText('Semana del lun 12 oct')).toBeInTheDocument()
-  expect(await rows()).toEqual(['Pectoral2 de 12', 'Tríceps1 de 10,5'])
+  expect(screen.getByRole('heading', { name: '12–18 oct' })).toBeInTheDocument()
+  expect(await groups()).toEqual({
+    'muscles-alta': ['Pectoral2 de 12'],
+    'muscles-otros': ['Tríceps1 de 10,5'],
+  })
+
+  await userEvent.click(screen.getByRole('button', { name: 'Esta semana' }))
+  expect(screen.getByRole('heading', { name: 'Esta semana' })).toBeInTheDocument()
+})
+
+test('deslizar de costado cambia de semana, pero no pasa de esta', async () => {
+  render(<MuscleVolume />)
+  const area = await screen.findByRole('region', { name: 'Volumen por músculo' })
+
+  fireEvent.pointerDown(area, { clientX: 300, clientY: 100 })
+  fireEvent.pointerUp(area, { clientX: 200, clientY: 100 })
+  expect(screen.getByRole('heading', { name: 'Esta semana' })).toBeInTheDocument()
+
+  fireEvent.pointerDown(area, { clientX: 100, clientY: 100 })
+  fireEvent.pointerUp(area, { clientX: 200, clientY: 100 })
+  expect(screen.getByRole('heading', { name: '12–18 oct' })).toBeInTheDocument()
 })
 
 test('tocar un músculo muestra qué ejercicios aportaron y la tendencia', async () => {
   render(<MuscleVolume />)
-  await rows()
+  await groups()
 
   await userEvent.click(screen.getByRole('button', { name: /Tríceps/ }))
 
   const detail = screen.getByRole('region', { name: 'Detalle de Tríceps' })
-  expect(detail).toHaveTextContent('Directas: 0')
-  expect(detail).toHaveTextContent('Press de banca con barra: 3 series × 0,5 = 1,5')
+  expect(within(detail).getByText('Directas').nextElementSibling).toHaveTextContent('0')
+  expect(within(detail).getByText('Press de banca con barra').nextElementSibling).toHaveTextContent(
+    '3 series · cuentan 1,5',
+  )
   const weeks = within(detail).getAllByRole('listitem').slice(-2)
-  expect(weeks.map((w) => w.textContent)).toEqual(['lun 12 oct1', 'lun 19 oct1,5'])
+  expect(weeks[0]).toHaveTextContent(/^1.*12 oct$/)
+  expect(weeks[1]).toHaveTextContent(/^1,5.*19 oct$/)
 })
 
-test('el detalle muestra las directas con el rango y la prioridad', async () => {
+test('el detalle muestra las directas con el rango y la meta', async () => {
   render(<MuscleVolume />)
-  await rows()
+  await groups()
 
   await userEvent.click(screen.getByRole('button', { name: /Pectoral/ }))
 
-  expect(screen.getByRole('region', { name: 'Detalle de Pectoral' })).toHaveTextContent(
-    'Directas: 3 · rango 10–14 · prioridad alta',
+  const detail = screen.getByRole('region', { name: 'Detalle de Pectoral' })
+  const stats = within(detail)
+    .getAllByRole('term')
+    .map((dt) => `${dt.textContent} ${dt.nextElementSibling?.textContent}`)
+  expect(stats).toEqual(['Directas 3', 'Rango 10–14', 'Meta 12'])
+  // Las directas no llevan la cuenta de 0,5
+  expect(within(detail).getByText('Press de banca con barra').nextElementSibling).toHaveTextContent(
+    /^3 series$/,
   )
 })

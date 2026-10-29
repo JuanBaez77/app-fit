@@ -9,6 +9,10 @@ const PATHS = {
     />
   ),
   chevron: <path d="M9 5.5l6.5 6.5L9 18.5" />,
+  chevronLeft: <path d="M15 5.5L8.5 12l6.5 6.5" />,
+  // El de los menús de iOS (chevron.up.chevron.down)
+  chevronUpDown: <path d="M8 9.5l4-4 4 4M8 14.5l4 4 4-4" />,
+  plus: <path d="M12 5v14M5 12h14" />,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   list: (
     <>
