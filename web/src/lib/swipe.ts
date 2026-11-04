@@ -3,6 +3,8 @@ import { useRef, type PointerEvent } from 'react'
 /** Lo que hay que arrastrar de costado para que cuente como deslizar */
 const SWIPE_PX = 50
 
+export type SwipeHandlers = ReturnType<typeof useSwipe>
+
 /**
  * Deslizar de costado, como entre meses en la app Calendario: 1 hacia la izquierda (lo que
  * sigue), -1 hacia la derecha. Lo vertical no cuenta, así sigue siendo scroll; el elemento

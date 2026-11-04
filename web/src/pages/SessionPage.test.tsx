@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { expect, test } from 'vitest'
@@ -66,13 +66,47 @@ test('muestra qué toca, la última vez, la mejor marca y precarga la serie 1', 
   renderSession()
 
   const card = await screen.findByRole('region', { name: 'Press de banca con barra' })
-  expect(within(card).getByText('1 / 2')).toBeInTheDocument()
-  expect(within(card).getByText('3 × 6–10 · RIR 1–2 · desc. 2–3 min')).toBeInTheDocument()
+  expect(within(card).getByText('Ejercicio 1 de 2')).toBeInTheDocument()
+  expect(
+    within(within(card).getByRole('list', { name: 'Qué toca' }))
+      .getAllByRole('listitem')
+      .map((li) => li.textContent),
+  ).toEqual(['3 × 6–10', 'RIR 1–2', 'desc. 2–3 min'])
   expect(within(card).getByText('Última vez').nextElementSibling).toHaveTextContent(
-    '80×8 80×8 80×7',
+    '80×8 · 80×8 · 80×7',
   )
-  expect(within(card).getByText('80×8 (1RM ≈ 101,3 kg)')).toBeInTheDocument()
+  expect(within(card).getByText('80×8 · 1RM ≈ 101,3 kg')).toBeInTheDocument()
   expect(within(card).getByText('80 kg × 8')).toBeInTheDocument()
+})
+
+test('arriba, el avance de las series de la rutina', async () => {
+  await seed()
+  renderSession()
+
+  const progress = await screen.findByRole('progressbar', { name: 'Series de la rutina' })
+  expect(progress).toHaveAttribute('aria-valuenow', '0')
+  expect(screen.getByText(/0 de 6 series/)).toBeInTheDocument()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'RIR 2: guardar' }))
+
+  expect(await screen.findByText(/1 de 6 series/)).toBeInTheDocument()
+  expect(progress).toHaveAttribute('aria-valuenow', '1')
+})
+
+test('deslizar de costado sobre el ejercicio pasa al siguiente y vuelve', async () => {
+  await seed()
+  renderSession()
+  const card = await screen.findByRole('region', { name: 'Press de banca con barra' })
+
+  fireEvent.pointerDown(card, { clientX: 300, clientY: 100 })
+  fireEvent.pointerUp(card, { clientX: 200, clientY: 105 })
+  const remo = await screen.findByRole('region', { name: 'Remo en T' })
+
+  fireEvent.pointerDown(remo, { clientX: 100, clientY: 100 })
+  fireEvent.pointerUp(remo, { clientX: 220, clientY: 100 })
+  expect(
+    await screen.findByRole('region', { name: 'Press de banca con barra' }),
+  ).toBeInTheDocument()
 })
 
 test('las series de hoy llevan el indicador contra la misma serie de la última vez', async () => {
@@ -90,7 +124,8 @@ test('se puede pasar a otro ejercicio; sin historial dice Primera vez', async ()
   await seed()
   renderSession()
 
-  await userEvent.click(await screen.findByRole('button', { name: 'Remo en T' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Ejercicios' }))
+  await userEvent.click(screen.getByRole('button', { name: /Remo en T/ }))
 
   const card = await screen.findByRole('region', { name: 'Remo en T' })
   expect(within(card).getByText('Primera vez')).toBeInTheDocument()
@@ -114,7 +149,7 @@ test('en la semana 1 usa las series de la rampa', async () => {
   })
   renderSession()
 
-  expect(await screen.findByText('2 × 6–10 · RIR 1–2 · desc. 2–3 min')).toBeInTheDocument()
+  expect(await screen.findByText('2 × 6–10')).toBeInTheDocument()
 })
 
 test('sesión inexistente', async () => {
@@ -144,7 +179,7 @@ test('una serie sin cambios se guarda con un toque en la ficha de RIR', async ()
     rir: 2,
     routine_day_exercise_id: 'rde-banca',
   })
-  expect(await screen.findByRole('region', { name: 'Serie 2' })).toBeInTheDocument()
+  expect(await screen.findByRole('region', { name: 'Serie 2 de 3' })).toBeInTheDocument()
   expect(await db.outbox.get(`set_logs:${saved!.id}`)).toBeDefined()
 })
 
@@ -199,11 +234,18 @@ test('con la última serie de la rutina pasa solo al ejercicio siguiente', async
 
   for (let i = 0; i < 3; i++) {
     await userEvent.click(await screen.findByRole('button', { name: 'RIR 2: guardar' }))
-    await screen.findByRole('region', { name: i < 2 ? `Serie ${i + 2}` : 'Serie 1' })
+    await screen.findByRole('region', { name: i < 2 ? `Serie ${i + 2} de 3` : 'Serie 1 de 3' })
   }
 
   expect(await screen.findByRole('region', { name: 'Remo en T' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: /Press de banca con barra/ })).toHaveTextContent('✓')
+  await userEvent.click(screen.getByRole('button', { name: 'Ejercicios' }))
+  expect(
+    screen.getByRole('button', { name: /Press de banca con barra.*3 de 3.*completo/ }),
+  ).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Remo en T.*0 de 3/ })).toHaveAttribute(
+    'aria-current',
+    'true',
+  )
 })
 
 test('una serie guardada se edita tocándola', async () => {
@@ -212,7 +254,7 @@ test('una serie guardada se edita tocándola', async () => {
   await userEvent.click(await screen.findByRole('button', { name: 'RIR 2: guardar' }))
 
   await userEvent.click(await screen.findByRole('button', { name: /Serie 1: 80 kg × 8/ }))
-  expect(screen.getByRole('region', { name: 'Editando serie 1' })).toBeInTheDocument()
+  expect(screen.getByRole('region', { name: 'Editar serie 1' })).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Más reps' }))
   await userEvent.click(screen.getByRole('button', { name: 'RIR 1: guardar' }))
 
@@ -226,7 +268,8 @@ test('borrar una serie se puede deshacer', async () => {
 
   await userEvent.click(await screen.findByRole('button', { name: /Serie 1: 80 kg/ }))
   await userEvent.click(screen.getByRole('button', { name: 'Borrar serie' }))
-  expect(await screen.findByText('Serie 1 borrada')).toBeInTheDocument()
+  // El aviso va arriba del panel, no encima de sus botones
+  expect((await screen.findByText('Serie 1 borrada')).closest('.session-dock')).not.toBeNull()
   expect(await todaySets()).toHaveLength(0)
 
   await userEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
@@ -238,15 +281,55 @@ test('un ejercicio fuera de rutina se agrega desde el catálogo', async () => {
   await seed()
   renderSession()
 
-  await userEvent.click(await screen.findByRole('button', { name: '+ ejercicio' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Ejercicios' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Agregar ejercicio' }))
   await userEvent.click(screen.getByRole('button', { name: 'Prensa' }))
   const card = await screen.findByRole('region', { name: 'Prensa' })
   expect(within(card).getByText('Fuera de rutina')).toBeInTheDocument()
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'RIR 1: guardar' }))
 
   expect(await todaySets()).toMatchObject([
     { exercise_id: 'ex-prensa', routine_day_exercise_id: null },
   ])
+})
+
+test('el catálogo se busca sin importar tildes ni mayúsculas', async () => {
+  await seed()
+  await db.exercises.put({ ...EXERCISES[2]!, id: 'ex-jalon', name: 'Jalón al pecho' })
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Ejercicios' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Agregar ejercicio' }))
+  const catalog = screen.getByRole('list', { name: 'Catálogo' })
+  expect(
+    within(catalog)
+      .getAllByRole('button')
+      .map((b) => b.textContent),
+  ).toEqual(['Jalón al pecho', 'Prensa'])
+
+  await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar ejercicio' }), 'JALON')
+  expect(
+    within(catalog)
+      .getAllByRole('button')
+      .map((b) => b.textContent),
+  ).toEqual(['Jalón al pecho'])
+  await userEvent.type(screen.getByRole('searchbox'), 'x')
+  expect(screen.getByText('No hay ejercicios con ese nombre.')).toBeInTheDocument()
+})
+
+test('la hoja de ejercicios se cierra con Escape y con Listo', async () => {
+  await seed()
+  renderSession()
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Ejercicios' }))
+  expect(screen.getByRole('dialog', { name: 'Ejercicios' })).toBeInTheDocument()
+  await userEvent.keyboard('{Escape}')
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+  await userEvent.click(screen.getByRole('button', { name: 'Ejercicios' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Listo' }))
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 })
 
 test('terminar la sesión guarda sueño y molestias y vuelve a Hoy', async () => {
@@ -269,6 +352,12 @@ test('terminar sin completar nada también cierra', async () => {
   renderSession()
 
   await userEvent.click(await screen.findByRole('button', { name: 'Terminar' }))
+  // El resumen, sin duración: la sesión de prueba empezó hace días
+  expect(
+    within(screen.getByRole('dialog', { name: 'Terminar la sesión' })).getByText(
+      '0 ejercicios · 0 series',
+    ),
+  ).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Terminar sesión' }))
 
   await screen.findByText('Pantalla Hoy')

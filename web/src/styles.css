@@ -158,6 +158,17 @@ button.primary {
   opacity: 0.6;
 }
 
+/* Como botón, sin el fondo ni el achique de los botones comunes: el círculo ya es el botón */
+button.icon-button {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+button.icon-button:active:not(:disabled) {
+  transform: none;
+}
+
 .icon {
   flex: none;
   display: block;
@@ -698,47 +709,132 @@ button.preview-more:active:not(:disabled) {
   }
 }
 
-.back {
-  min-width: var(--touch);
-  min-height: var(--touch);
-  display: inline-flex;
-  align-items: center;
-  font-size: 2rem;
-  color: var(--accent);
-  text-decoration: none;
-}
-
 .exercise-list {
   padding-left: 20px;
 }
 
-/* Sesión: tarjeta del ejercicio actual */
+/* Sesión. La barra de arriba, como la de navegación de iOS: volver a la izquierda, acciones a la
+   derecha */
+.session-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -4px -8px 0 -10px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding-right: 8px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.session-bar-actions {
+  display: flex;
+  align-items: center;
+}
+
+button.session-finish {
+  font-weight: 700;
+}
+
+/* El día, con el avance de toda la sesión */
+.session-title {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 20px;
+}
+
+.session-title h1 {
+  font-size: 1.65rem;
+}
+
+.session-title p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* El ejercicio de ahora: sin tarjeta, con sus series en una lista agrupada */
 .exercise-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.exercise-card.from-next {
+  animation: month-from-next 200ms ease-out;
+}
+
+.exercise-card.from-prev {
+  animation: month-from-prev 200ms ease-out;
 }
 
 .exercise-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
 }
 
-.prescription {
-  margin: 4px 0 12px;
-  font-weight: 500;
+.exercise-card-header h2 {
+  margin: 0;
+}
+
+/* Los puntos de iOS para saber en qué página estás */
+.page-dots {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+.page-dots > span:not(.sr-only) {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--surface-3);
+}
+
+.page-dots > span.on {
+  background: var(--text);
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+ul.pills li {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: var(--fs-subhead);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .history {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 12px;
-  margin: 0 0 12px;
+  gap: 2px;
+  margin: 0;
+  font-size: var(--fs-subhead);
+}
+
+.history div {
+  display: flex;
+  gap: 8px;
 }
 
 .history dt {
+  flex: none;
+  width: 6.5em;
   color: var(--muted);
 }
 
@@ -749,40 +845,83 @@ button.preview-more:active:not(:disabled) {
 }
 
 .sets {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 6px;
+  margin-top: 4px;
 }
 
-.set-row {
+.grouped-row.set-row {
   display: grid;
-  grid-template-columns: 2.5em 1fr auto 1.5em;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-height: var(--touch);
-  padding: 0 8px;
-  text-align: left;
+  grid-template-columns: 28px 1fr auto 1.5em;
+  gap: 12px;
+  min-height: 52px;
   font-variant-numeric: tabular-nums;
 }
 
 button.set-row {
-  background: var(--surface-2);
   font-weight: 500;
 }
 
 button.set-row[aria-pressed='true'] {
-  border-color: var(--accent);
+  background-color: var(--surface-2);
+}
+
+/* Hecha: círculo verde con el check. La que sigue: el número con un anillo verde */
+.set-mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+  color: var(--accent);
+  font-family: var(--font-numbers);
+  font-size: var(--fs-footnote);
+  font-weight: 800;
+}
+
+.set-mark.done {
+  background: var(--ok);
+  box-shadow: none;
+  color: #000000;
+}
+
+.sets li.next {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
 }
 
 .sets li.next .set-row {
   font-weight: 700;
 }
 
-.set-number {
-  color: var(--muted);
+/* La confirmación al guardar: el check aparece y la fila se ilumina un momento */
+.just-saved .set-mark {
+  animation: set-saved 350ms ease-out;
+}
+
+.just-saved .set-row {
+  animation: row-saved 900ms ease-out;
+}
+
+@keyframes set-saved {
+  from {
+    transform: scale(0.4);
+  }
+
+  60% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes row-saved {
+  from {
+    background-color: var(--ok-tint);
+  }
+}
+
+.sets-complete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ok);
 }
 
 .trend {
@@ -798,57 +937,33 @@ button.set-row[aria-pressed='true'] {
   color: var(--danger);
 }
 
-.exercise-nav {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  margin-top: 16px;
-  padding-bottom: 4px;
-}
-
-.exercise-nav button {
-  white-space: nowrap;
-  flex: none;
-  border-radius: 999px;
-}
-
-.exercise-nav button[aria-current='true'] {
-  background: var(--text);
-  color: var(--bg);
-  font-weight: 700;
-}
-
-.last-set + .last-set {
-  margin-left: 0.9em;
-}
-
-/* Panel de registro: fijo abajo, donde llega el pulgar */
+/* El panel de registro: fijo abajo, donde llega el pulgar */
 .session {
   padding-bottom: 0;
 }
 
-/* En la sesión, el título va chico: deja lugar al ejercicio */
-.session .page-header {
-  margin: 0 0 12px;
+.session-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin: 20px -16px 0;
 }
 
-.session h1 {
-  flex: 1;
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0;
+/* Deshacer va arriba del panel, para no tapar sus botones */
+.session-dock .toast {
+  position: absolute;
+  right: 16px;
+  bottom: calc(100% + 12px);
+  left: 16px;
 }
 
 .set-panel {
-  position: sticky;
-  bottom: 0;
-  margin: 16px -16px 0;
-  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
-  background: var(--surface);
-  border-radius: 24px 24px 0 0;
-  box-shadow: 0 -8px 24px rgb(0 0 0 / 60%);
   display: grid;
   gap: 10px;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  background: var(--surface);
+  box-shadow: 0 -8px 24px rgb(0 0 0 / 60%);
 }
 
 .set-panel-title {
@@ -857,19 +972,23 @@ button.set-row[aria-pressed='true'] {
   align-items: center;
 }
 
+.set-panel-title .link,
+.set-panel-actions .link {
+  min-height: 40px;
+  padding: 0;
+}
+
 .stepper {
   display: grid;
-  grid-template-columns: 4.5em 56px 1fr 56px;
+  grid-template-columns: 4em 56px 1fr 56px;
   align-items: center;
   gap: 8px;
 }
 
 .stepper-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--muted);
+  font-size: var(--fs-subhead);
+  font-weight: 600;
 }
 
 .stepper > button,
@@ -883,14 +1002,15 @@ button.set-row[aria-pressed='true'] {
   user-select: none;
 }
 
-/* Los botones redondos de − y +, con el número grande en el medio */
+/* − y +: círculos grises; el color queda para las fichas de RIR, que son las que guardan */
 .stepper > button:not(.stepper-value) {
+  display: grid;
+  place-items: center;
   height: 56px;
   padding: 0;
   border-radius: 50%;
-  background: var(--hot);
-  color: #000000;
-  font-size: 1.8rem;
+  background: var(--surface-3);
+  color: var(--text);
 }
 
 .stepper .stepper-value {
@@ -899,10 +1019,15 @@ button.set-row[aria-pressed='true'] {
   font-size: 2rem;
 }
 
+.stepper-value small {
+  color: var(--muted);
+  font-size: var(--fs-subhead);
+}
+
 .rir-hint {
   margin: 4px 0 0;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: var(--fs-subhead);
 }
 
 .rir-chips {
@@ -952,33 +1077,176 @@ button.danger {
   font-weight: 700;
 }
 
-.picker {
-  display: grid;
-  gap: 8px;
-  margin-top: 12px;
+/* Hojas de abajo, como las de iOS: suben sobre lo que había, que se oscurece */
+.sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
-.picker button {
-  text-align: left;
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 55%);
+  animation: fade-in 200ms ease-out;
+}
+
+.sheet {
+  position: relative;
+  max-height: 88dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 16px calc(24px + env(safe-area-inset-bottom));
+  border-radius: 16px 16px 0 0;
+  background: var(--surface);
+  outline: none;
+  animation: sheet-up 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sheet-grabber {
+  width: 36px;
+  height: 5px;
+  margin: 0 auto 8px;
+  border-radius: 3px;
+  background: var(--surface-3);
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  margin-bottom: 12px;
+}
+
+.sheet-header h2 {
+  margin: 0;
+  font-size: var(--fs-title3);
+}
+
+.sheet-header .link {
+  padding-right: 0;
+  font-weight: 700;
+}
+
+/* Dentro de la hoja, las filas van un gris más claro, como en iOS */
+.sheet .grouped,
+.sheet .grouped-empty {
+  background: var(--surface-2);
+}
+
+.sheet .grouped > li + li {
+  background-image: linear-gradient(#48484a, #48484a);
+}
+
+.sheet button.grouped-row:active:not(:disabled) {
+  background-color: var(--surface-3);
+}
+
+.sheet-group {
+  margin-top: 16px;
+}
+
+.exercise-row[aria-current='true'] .grouped-row-text > :first-child {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.done-check {
+  flex: none;
+  width: 18px;
+  color: var(--ok);
+}
+
+.search-field {
+  min-height: 40px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* Cierre de la sesión */
 .finish {
   display: grid;
-  gap: 16px;
-  margin-top: 8px;
 }
 
-.finish label {
+.finish-summary {
+  margin: 0 4px 16px;
+  font-family: var(--font-numbers);
+  font-size: var(--fs-title3);
+  font-weight: 700;
+}
+
+/* Una fila de formulario: el nombre a la izquierda y el valor a la derecha */
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  padding: 6px 16px;
+}
+
+.form-row input {
+  width: 5em;
+  min-height: 40px;
+  padding: 0 4px;
+  background: transparent;
+  font-family: var(--font-numbers);
+  text-align: right;
+}
+
+.form-row.stacked {
   display: grid;
-  gap: 6px;
-  font-weight: 500;
+  gap: 2px;
+  padding: 10px 16px;
+}
+
+.form-row.stacked input {
+  width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.finish .list-footer {
+  margin-bottom: 16px;
+}
+
+.finish-cancel {
+  justify-self: center;
+  margin-top: 4px;
 }
 
 .finish-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exercise-card.from-next,
+  .exercise-card.from-prev,
+  .just-saved .set-mark,
+  .just-saved .set-row,
+  .sheet,
+  .sheet-backdrop {
+    animation: none;
+  }
 }
 
 /* Calendario. El mes con flechas sueltas, como en la app Calendario de iOS */

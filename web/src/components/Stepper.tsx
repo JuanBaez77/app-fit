@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import Icon from './Icon'
 
 const REPEAT_DELAY_MS = 400
 const REPEAT_EVERY_MS = 90
@@ -81,7 +82,7 @@ export default function Stepper({
         onClick={() => change(-step)}
         {...minus}
       >
-        −
+        <Icon name="minus" size={24} />
       </button>
       {editing ? (
         <input
@@ -116,7 +117,7 @@ export default function Stepper({
         onClick={() => change(step)}
         {...plus}
       >
-        +
+        <Icon name="plus" size={24} />
       </button>
     </div>
   )
